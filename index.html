@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMD Radar Status Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 30px; }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 5px; }
+        .update-time { text-align: center; color: #7f8c8d; margin-bottom: 30px; font-size: 14px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; transition: transform 0.2s; border-top: 4px solid #3498db; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+        .card.offline-card { border-top: 4px solid #e74c3c; }
+        .status-dot { height: 16px; width: 16px; border-radius: 50%; display: inline-block; margin-right: 8px; vertical-align: -2px; }
+        .online { background-color: #2ecc71; box-shadow: 0 0 10px #2ecc71; }
+        .offline { background-color: #e74c3c; box-shadow: 0 0 10px #e74c3c; animation: blink 1s infinite; }
+        .st-name { font-size: 20px; font-weight: bold; margin: 15px 0 10px; color: #34495e; }
+        .st-link { text-decoration: none; color: #fff; background-color: #3498db; padding: 8px 15px; border-radius: 20px; font-size: 13px; display: inline-block; transition: background 0.2s; }
+        .st-link:hover { background-color: #2980b9; }
+        .status-text { color: #7f8c8d; font-size: 14px; font-weight: 500; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <h2>📡 Dashboard ระบบติดตามสถานะการอัปเดทภาพเรดาร์ตรวจอากาศบนเว็บไซต์</h2>
+    <div class="update-time" id="lastUpdate">กำลังเชื่อมต่อข้อมูลล่าสุด...</div>
+    <div class="grid" id="dashboard"></div>
+
+    <script>
+        function fetchData() {
+            // เติมเวลาต่อท้ายเพื่อแก้ปัญหา Browser Cache ไม่ยอมดึงของใหม่
+            fetch('data.json?t=' + new Date().getTime())
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('lastUpdate').innerText = '🔄 สแกนหน้าเว็บล่าสุด: ' + data.last_update;
+                    const dashboard = document.getElementById('dashboard');
+                    dashboard.innerHTML = ''; 
+
+                    data.stations.forEach(st => {
+                        const isOnline = st.status === 'online';
+                        const statusClass = isOnline ? 'online' : 'offline';
+                        const cardClass = isOnline ? '' : 'offline-card';
+                        const statusText = isOnline ? 'อัปเดตปกติ' : 'ภาพค้าง / ขาดการติดต่อ';
+                        
+                        const card = document.createElement('div');
+                        card.className = `card ${cardClass}`;
+                        card.innerHTML = `
+                            <div>
+                                <span class="status-dot ${statusClass}"></span>
+                                <span class="status-text">${statusText}</span>
+                            </div>
+                            <div class="st-name">${st.name}</div>
+                            <a href="${st.url}" target="_blank" class="st-link">🔍 ดูภาพเรดาร์ต้นฉบับ</a>
+                        `;
+                        dashboard.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    document.getElementById('lastUpdate').innerText = '⚠️ รอระบบส่วนหลังบ้านอัปเดตข้อมูลขึ้นเซิร์ฟเวอร์...';
+                });
+        }
+
+        // ดึงครั้งแรกและตั้งเวลาอัตโนมัติให้หน้าเว็บดึงใหม่ทุก 3 นาที (180,000 มิลลิวินาที)
+        fetchData();
+        setInterval(fetchData, 180000);
+    </script>
+
+</body>
+</html>
