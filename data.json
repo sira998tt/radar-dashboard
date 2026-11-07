@@ -1,5 +1,5 @@
 {
-  "last_update": "07/11/2026 11:26:41",
+  "last_update": "07/11/2026 11:30:10",
   "stations": [
     {
       "id": "STP",
@@ -10,7 +10,7 @@
     {
       "id": "STP_HQ",
       "name": "สทิงพระ (HQ)",
-      "status": "online",
+      "status": "offline",
       "url": "https://weather.tmd.go.th/stp/stp240_HQ_latest.jpg"
     },
     {
@@ -22,7 +22,7 @@
     {
       "id": "STP_HQ_LOOP",
       "name": "สทิงพระ (HQ Loop)",
-      "status": "online",
+      "status": "offline",
       "url": "https://weather.tmd.go.th/stp/stpHQloop.gif"
     },
     {
