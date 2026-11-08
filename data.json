@@ -1,5 +1,5 @@
 {
-  "last_update": "08/11/2026 16:28:46",
+  "last_update": "08/11/2026 16:32:22",
   "stations": [
     {
       "id": "STP",
@@ -52,25 +52,25 @@
     {
       "id": "HYI",
       "name": "หาดใหญ่",
-      "status": "online",
+      "status": "offline",
       "url": "https://weather.tmd.go.th/hyi/hyi240_latest.jpg"
     },
     {
       "id": "HYI_HQ",
       "name": "หาดใหญ่ (HQ)",
-      "status": "online",
+      "status": "offline",
       "url": "https://weather.tmd.go.th/hyi/hyi240_HQ_latest.jpg"
     },
     {
       "id": "HYI_LOOP",
       "name": "หาดใหญ่ (Loop)",
-      "status": "online",
+      "status": "offline",
       "url": "https://weather.tmd.go.th/hyi/hyiLoop.gif"
     },
     {
       "id": "HYI_HQ_LOOP",
       "name": "หาดใหญ่ (HQ Loop)",
-      "status": "online",
+      "status": "offline",
       "url": "https://weather.tmd.go.th/hyi/hyiHQloop.gif"
     },
     {
