@@ -20,6 +20,7 @@
             --pill-bg: #ffffff;
             --bar-bg: #e0e0e0;
             --map-loading-bg: rgba(255, 255, 255, 0.8);
+            --critical-bg: #fff0f0;
         }
 
         body.dark-mode {
@@ -33,6 +34,7 @@
             --pill-bg: #2a2a2a;
             --bar-bg: #333333;
             --map-loading-bg: rgba(30, 30, 30, 0.8);
+            --critical-bg: #3a1515;
         }
 
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 30px; color: var(--text-main); transition: background-color 0.3s, color 0.3s; }
@@ -56,9 +58,24 @@
         .summary-pill.error { border-left-color: #e74c3c; }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
-        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px var(--card-shadow); text-align: center; transition: transform 0.2s, box-shadow 0.2s; border-top: 4px solid var(--border-default); }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px var(--card-shadow); text-align: center; transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s; border-top: 4px solid var(--border-default); }
         .card:hover { transform: translateY(-5px); box-shadow: 0 6px 12px var(--card-shadow-hover); }
         .card.offline-card { border-top: 4px solid #e74c3c; }
+        
+        /* 🔥 โหมดวิกฤต (ค้างเกิน 3 ชม.) */
+        .card.offline-critical { 
+            border-top: 4px solid #8b0000 !important; 
+            background-color: var(--critical-bg); 
+            animation: shake 2.5s infinite; 
+        }
+        
+        /* อนิเมชันสั่นเตือน */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            2%, 6%, 10% { transform: translateX(-2px); }
+            4%, 8% { transform: translateX(2px); }
+            12% { transform: translateX(0); }
+        }
         
         .status-dot { height: 16px; width: 16px; border-radius: 50%; display: inline-block; margin-right: 8px; vertical-align: -2px; }
         .online { background-color: #2ecc71; box-shadow: 0 0 10px #2ecc71; }
@@ -75,28 +92,16 @@
         #mapWrapper { display: none; position: relative; max-width: 1200px; margin: 0 auto; border-radius: 12px; box-shadow: 0 4px 6px var(--card-shadow); border: 2px solid var(--bar-bg); overflow: hidden; }
         #mapView { height: 600px; width: 100%; z-index: 1; }
         
-        /* แถบแจ้งเตือนตอนรอหมุดแผนที่โหลด */
         #mapLoadingOverlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--map-loading-bg);
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--text-main);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--map-loading-bg); z-index: 2; display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: bold; color: var(--text-main);
         }
 
-        body.dark-mode .leaflet-layer,
-        body.dark-mode .leaflet-control-zoom-in,
-        body.dark-mode .leaflet-control-zoom-out,
-        body.dark-mode .leaflet-control-attribution {
+        body.dark-mode .leaflet-layer, body.dark-mode .leaflet-control-zoom-in, body.dark-mode .leaflet-control-zoom-out, body.dark-mode .leaflet-control-attribution {
             filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
         }
 
-        /* 📱 จัดการหน้าจอมือถือ */
         @media (max-width: 600px) {
             h2 { font-size: 20px; margin-top: 45px; }
             .top-controls { top: 10px; right: 10px; gap: 5px; }
@@ -117,7 +122,7 @@
         <button class="control-btn icon-btn" id="themeToggle" title="สลับโหมดสว่าง/มืด">🌙</button>
     </div>
 
-    <h2>📡 Dashboard ระบบติดตามเรดาร์ตรวจอากาศ</h2>
+    <h2>📡 Dashboard ระบบติดตามการอัปเดตภาพเรดาร์ตรวจอากาศบนเว็บไซต์</h2>
     
     <div class="progress-container">
         <div class="progress-bar" id="progressBar"></div>
@@ -127,10 +132,8 @@
     </div>
     
     <div class="summary-container" id="summaryContainer"></div>
-    
     <div class="grid" id="dashboard"></div>
     
-    <!-- 🗺️ คอนเทนเนอร์สำหรับแผนที่ พร้อม Loading Overlay -->
     <div id="mapWrapper">
         <div id="mapLoadingOverlay">⏳ กำลังดึงข้อมูลพิกัดและสถานะสถานี...</div>
         <div id="mapView"></div>
@@ -145,11 +148,20 @@
             else { localStorage.setItem('theme', 'light'); toggleBtn.innerText = '🌙'; }
         });
 
+        // -----------------------------------------
+        // 🔊 ปรับแต่งระดับเสียงและไฟล์เสียงใหม่
+        // -----------------------------------------
         let soundMode = 0; 
         const soundToggleBtn = document.getElementById('soundToggle');
         const ackBtn = document.getElementById('ackBtn');
+        
+        // เสียงสั้น (ลดเสียงให้เบาลงเหลือ 30%)
         const shortSound = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-        const longSound = new Audio('https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg');
+        shortSound.volume = 0.8;
+        
+        // เสียงยาว (ใช้กริ่งนาฬิกาปลุก และเปิดเสียงสุด 100%)
+        const longSound = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
+        longSound.volume = 1.0;
         longSound.loop = true; 
 
         soundToggleBtn.addEventListener('click', () => {
@@ -199,12 +211,11 @@
                 mapWrapper.style.display = 'block';
                 initMap();
                 
-                // ถ้ารับข้อมูลมาแล้ว ให้ลบ overlay ออกและวาดหมุด
                 if (Object.keys(lastGroupsData).length > 0) {
                     mapLoadingOverlay.style.display = 'none';
                     updateMapMarkers(lastGroupsData);
                 } else {
-                    mapLoadingOverlay.style.display = 'flex'; // ถ้าข้อมูลยังไม่มา ให้โชว์ overlay
+                    mapLoadingOverlay.style.display = 'flex'; 
                 }
                 
                 setTimeout(() => map.invalidateSize(), 100);
@@ -283,6 +294,7 @@
                         
                         const isOnline = st.status === 'online';
                         let statusText = 'อัปเดตปกติ';
+                        let isCritical = false; // ตัวแปรเช็ควิกฤต
                         
                         if (!isOnline) {
                             groups[baseName].offline += 1;
@@ -290,12 +302,21 @@
                             const timeStr = formatDelayTime(delayMins);
                             statusText = `ภาพค้างมาแล้ว ${timeStr}`;
                             
-                            // เก็บรายละเอียดของสถานีย่อยที่ค้างไว้โชว์ในแผนที่
-                            groups[baseName].offlineDetails.push(`🔴 ${st.name} <br><small style="color:#7f8c8d;">ค้างมาแล้ว: ${timeStr}</small>`);
+                            // ⚠️ ถ้าค้างเกิน 180 นาที (3 ชม.) ปรับเป็นวิกฤต
+                            if (delayMins >= 180) {
+                                isCritical = true;
+                            }
+                            
+                            groups[baseName].offlineDetails.push(`🔴 ${st.name} <br><small style="color:#7f8c8d;">ค้าง: ${timeStr}</small>`);
                         }
 
                         const statusClass = isOnline ? 'online' : 'offline';
-                        const cardClass = isOnline ? '' : 'offline-card';
+                        let cardClass = isOnline ? '' : 'offline-card';
+                        
+                        // เติมคลาสวิกฤตเข้าไปที่การ์ด ถ้าค้างนาน
+                        if (isCritical) {
+                            cardClass += ' offline-critical';
+                        }
                         
                         const card = document.createElement('div');
                         card.className = `card ${cardClass}`;
@@ -310,7 +331,6 @@
                         dashboard.appendChild(card);
                     });
 
-                    // สร้างป้ายสรุป
                     for (const [name, stats] of Object.entries(groups)) {
                         const pill = document.createElement('div');
                         const hasError = stats.offline > 0;
@@ -320,8 +340,6 @@
                     }
                     
                     lastGroupsData = groups;
-                    
-                    // ปิดหน้าจอ Loading แผนที่เมื่อได้ข้อมูล
                     mapLoadingOverlay.style.display = 'none';
                     updateMapMarkers(groups); 
                 })
@@ -334,7 +352,6 @@
                 });
         }
 
-        // ฟังก์ชันวาดหมุดบนแผนที่ พร้อมรายละเอียด
         function updateMapMarkers(groups) {
             if (!map) return; 
             
