@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TMD Radar Status Dashboard</title>
+    
+    <!-- 🗺️ นำเข้าไลบรารีแผนที่ Leaflet.js -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
         :root {
             --bg-color: #f4f6f9;
@@ -31,8 +36,8 @@
 
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 30px; color: var(--text-main); transition: background-color 0.3s, color 0.3s; }
 
-        .top-controls { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; }
-        .control-btn { background: var(--card-bg); border: none; font-size: 16px; font-family: inherit; color: var(--text-main); cursor: pointer; padding: 10px 15px; border-radius: 25px; box-shadow: 0 2px 5px var(--card-shadow); transition: transform 0.2s; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .top-controls { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 1000; }
+        .control-btn { background: var(--card-bg); border: none; font-size: 15px; font-family: inherit; color: var(--text-main); cursor: pointer; padding: 10px 15px; border-radius: 25px; box-shadow: 0 2px 5px var(--card-shadow); transition: transform 0.2s; display: flex; align-items: center; justify-content: center; font-weight: bold; }
         .control-btn:hover { transform: scale(1.05); }
         .icon-btn { width: 45px; height: 45px; border-radius: 50%; padding: 10px; font-size: 20px; }
 
@@ -41,7 +46,6 @@
 
         h2 { text-align: center; margin-bottom: 5px; }
         
-        /* ⏳ แถบ Progress Bar นับถอยหลัง */
         .progress-container { max-width: 1200px; margin: 0 auto 15px auto; background-color: var(--bar-bg); border-radius: 10px; overflow: hidden; height: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
         .progress-bar { height: 100%; width: 100%; background-color: #3498db; transition: width 1s linear; }
         .update-time { text-align: center; color: var(--text-muted); margin-bottom: 25px; font-size: 14px; }
@@ -66,12 +70,25 @@
         
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
+        /* 🗺️ สไตล์ของแผนที่ */
+        #mapView { display: none; height: 600px; max-width: 1200px; margin: 0 auto; border-radius: 12px; box-shadow: 0 4px 6px var(--card-shadow); border: 2px solid var(--bar-bg); z-index: 1; }
+        
+        /* 🌙 ฟิลเตอร์ทำแผนที่ให้เป็นโทนมืดอัตโนมัติเมื่อเปิด Dark Mode */
+        body.dark-mode .leaflet-layer,
+        body.dark-mode .leaflet-control-zoom-in,
+        body.dark-mode .leaflet-control-zoom-out,
+        body.dark-mode .leaflet-control-attribution {
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+        }
+
+        /* 📱 จัดการหน้าจอมือถือ */
         @media (max-width: 600px) {
             h2 { font-size: 20px; margin-top: 45px; }
             .top-controls { top: 10px; right: 10px; gap: 5px; }
-            .control-btn { padding: 8px 12px; font-size: 14px; }
+            .control-btn { padding: 8px 12px; font-size: 13px; }
             .icon-btn { width: 35px; height: 35px; font-size: 16px; }
             #ackBtn { width: 90%; font-size: 18px; padding: 15px 20px; }
+            #mapView { height: 400px; }
         }
     </style>
 </head>
@@ -80,6 +97,7 @@
     <button id="ackBtn">🛑 ปิดเสียงเตือน (รับทราบ)</button>
 
     <div class="top-controls">
+        <button class="control-btn" id="viewToggle" title="สลับมุมมองแผนที่/การ์ด">🗺️ แผนที่</button>
         <button class="control-btn" id="soundToggle" title="สลับโหมดแจ้งเตือน">🔕 ปิดเสียง</button>
         <button class="control-btn icon-btn" id="themeToggle" title="สลับโหมดสว่าง/มืด">🌙</button>
     </div>
@@ -94,9 +112,17 @@
     </div>
     
     <div class="summary-container" id="summaryContainer"></div>
+    
+    <!-- 🗂️ คอนเทนเนอร์แบบตารางการ์ด (อันเดิม) -->
     <div class="grid" id="dashboard"></div>
+    
+    <!-- 🗺️ คอนเทนเนอร์สำหรับแผนที่ (อันใหม่) -->
+    <div id="mapView"></div>
 
     <script>
+        // -----------------------------------------
+        // 🌙 ระบบสลับ Dark / Light Mode
+        // -----------------------------------------
         const toggleBtn = document.getElementById('themeToggle');
         if (localStorage.getItem('theme') === 'dark') { document.body.classList.add('dark-mode'); toggleBtn.innerText = '☀️'; }
         toggleBtn.addEventListener('click', () => {
@@ -105,6 +131,9 @@
             else { localStorage.setItem('theme', 'light'); toggleBtn.innerText = '🌙'; }
         });
 
+        // -----------------------------------------
+        // 🔊 ระบบเสียงแจ้งเตือน
+        // -----------------------------------------
         let soundMode = 0; 
         const soundToggleBtn = document.getElementById('soundToggle');
         const ackBtn = document.getElementById('ackBtn');
@@ -115,15 +144,63 @@
         soundToggleBtn.addEventListener('click', () => {
             soundMode = (soundMode + 1) % 3; 
             if (soundMode === 0) { soundToggleBtn.innerText = '🔕 ปิดเสียง'; longSound.pause(); longSound.currentTime = 0; } 
-            else if (soundMode === 1) { soundToggleBtn.innerText = '🔔 เตือนสั้น'; shortSound.play().catch(e=>console.log("Audio blocked")); } 
-            else if (soundMode === 2) { soundToggleBtn.innerText = '🚨 เตือนยาว'; shortSound.play().catch(e=>console.log("Audio blocked")); }
+            else if (soundMode === 1) { soundToggleBtn.innerText = '🔔 เตือนสั้น'; shortSound.play().catch(e=>console.log(e)); } 
+            else if (soundMode === 2) { soundToggleBtn.innerText = '🚨 เตือนยาว'; shortSound.play().catch(e=>console.log(e)); }
         });
-
         ackBtn.addEventListener('click', () => { longSound.pause(); longSound.currentTime = 0; ackBtn.style.display = 'none'; });
 
+        // -----------------------------------------
+        // 🗺️ ระบบสลับมุมมอง แผนที่ / การ์ด
+        // -----------------------------------------
+        let isMapView = false;
+        let map;
+        let mapMarkers = [];
+        
+        // พิกัดของแต่ละสถานีหลัก
+        const stationCoords = {
+            "สทิงพระ": [7.451303, 100.452018],
+            "นราธิวาส": [6.440840, 101.791666],
+            "หาดใหญ่": [6.939701, 100.392371],
+            "สุราษฎร์ธานี": [9.133966, 99.151892],
+            "ชุมพร": [10.498577, 99.188507]
+        };
+
+        const viewToggleBtn = document.getElementById('viewToggle');
+        const dashboardDiv = document.getElementById('dashboard');
+        const mapViewDiv = document.getElementById('mapView');
+
+        function initMap() {
+            if (!map) {
+                // ตั้งค่าจุดศูนย์กลางแผนที่ให้อยู่บริเวณภาคใต้
+                map = L.map('mapView').setView([8.5, 100.0], 6);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap TMD Radar'
+                }).addTo(map);
+            }
+        }
+
+        viewToggleBtn.addEventListener('click', () => {
+            isMapView = !isMapView;
+            if (isMapView) {
+                viewToggleBtn.innerHTML = '🗂️ แบบการ์ด';
+                dashboardDiv.style.display = 'none';
+                mapViewDiv.style.display = 'block';
+                initMap();
+                setTimeout(() => map.invalidateSize(), 100); // แก้บั๊กจอดำเมื่อซ่อน/แสดงแผนที่
+            } else {
+                viewToggleBtn.innerHTML = '🗺️ แผนที่';
+                dashboardDiv.style.display = 'grid';
+                mapViewDiv.style.display = 'none';
+            }
+        });
+
+        // -----------------------------------------
+        // ⏳ ระบบตัวนับเวลาถอยหลัง
+        // -----------------------------------------
         let previousStateString = null;
         let countdownTime = 180;
         let timerInterval;
+        let lastGroupsData = {}; // เก็บข้อมูลอัปเดตไว้ใส่แผนที่
 
         function startCountdown() {
             clearInterval(timerInterval);
@@ -146,6 +223,9 @@
             }, 1000);
         }
 
+        // -----------------------------------------
+        // 📡 ระบบดึงข้อมูลหลัก
+        // -----------------------------------------
         function fetchData() {
             fetch('data.json?t=' + new Date().getTime())
                 .then(response => response.json())
@@ -177,19 +257,16 @@
                         const statusClass = isOnline ? 'online' : 'offline';
                         const cardClass = isOnline ? '' : 'offline-card';
                         
-                        // 📌 แปลงเวลาที่ค้างจากนาที เป็น วัน / ชม / นาที
                         let statusText = 'อัปเดตปกติ';
                         if (!isOnline) {
                             const delayMinutes = st.delay_mins || 0;
-                            let d = Math.floor(delayMinutes / 1440); // 1 วัน = 1440 นาที
+                            let d = Math.floor(delayMinutes / 1440);
                             let h = Math.floor((delayMinutes % 1440) / 60);
                             let m = Math.floor(delayMinutes % 60);
-                            
                             let timeStr = "";
                             if (d > 0) timeStr += d + " วัน ";
                             if (h > 0) timeStr += h + " ชม. ";
                             timeStr += m + " นาที";
-                            
                             statusText = `ภาพค้างมาแล้ว ${timeStr.trim()}`;
                         }
                         
@@ -206,6 +283,7 @@
                         dashboard.appendChild(card);
                     });
 
+                    // อัปเดตข้อมูลป้ายสรุป
                     for (const [name, stats] of Object.entries(groups)) {
                         const pill = document.createElement('div');
                         const hasError = stats.offline > 0;
@@ -213,6 +291,9 @@
                         pill.innerHTML = hasError ? `🔴 ${name} (${stats.total - stats.offline}/${stats.total})` : `🟢 ${name} (${stats.total}/${stats.total})`;
                         summaryContainer.appendChild(pill);
                     }
+                    
+                    // อัปเดตหมุดบนแผนที่
+                    updateMapMarkers(groups);
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -223,6 +304,43 @@
                 });
         }
 
+        // ฟังก์ชันวาดหมุดบนแผนที่
+        function updateMapMarkers(groups) {
+            if (!map) return; // ถ้าแผนที่ยังไม่ถูกกดเปิดดู ก็ยังไม่ต้องวาด
+            
+            // ลบหมุดเก่าออกก่อนวาดใหม่
+            mapMarkers.forEach(marker => map.removeLayer(marker));
+            mapMarkers = [];
+
+            for (const [name, stats] of Object.entries(groups)) {
+                if (stationCoords[name]) {
+                    const hasError = stats.offline > 0;
+                    const color = hasError ? '#e74c3c' : '#2ecc71'; // แดง / เขียว
+                    
+                    const popupContent = `
+                        <div style="font-family: 'Segoe UI', Tahoma, sans-serif; text-align: center; min-width: 120px;">
+                            <h3 style="margin: 0 0 8px 0; color: #333;">${name}</h3>
+                            <p style="margin: 0; font-weight: bold; color: ${color};">
+                                ${hasError ? '🔴 มีภาพค้าง' : '🟢 อัปเดตปกติ'} (${stats.total - stats.offline}/${stats.total})
+                            </p>
+                        </div>
+                    `;
+
+                    // สร้างหมุดวงกลมสีต่างๆ
+                    const marker = L.circleMarker(stationCoords[name], {
+                        color: '#ffffff',
+                        weight: 2,
+                        fillColor: color,
+                        fillOpacity: 1,
+                        radius: 12
+                    }).bindPopup(popupContent).addTo(map);
+
+                    mapMarkers.push(marker);
+                }
+            }
+        }
+
+        // โหลดข้อมูลครั้งแรก
         fetchData();
     </script>
 </body>
