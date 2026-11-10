@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TMD Radar Status Dashboard</title>
     
-    <!-- 🗺️ นำเข้าไลบรารีแผนที่ Leaflet.js -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -20,6 +19,7 @@
             --border-default: #3498db;
             --pill-bg: #ffffff;
             --bar-bg: #e0e0e0;
+            --map-loading-bg: rgba(255, 255, 255, 0.8);
         }
 
         body.dark-mode {
@@ -32,6 +32,7 @@
             --border-default: #2980b9;
             --pill-bg: #2a2a2a;
             --bar-bg: #333333;
+            --map-loading-bg: rgba(30, 30, 30, 0.8);
         }
 
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 30px; color: var(--text-main); transition: background-color 0.3s, color 0.3s; }
@@ -71,9 +72,23 @@
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
         /* 🗺️ สไตล์ของแผนที่ */
-        #mapView { display: none; height: 600px; max-width: 1200px; margin: 0 auto; border-radius: 12px; box-shadow: 0 4px 6px var(--card-shadow); border: 2px solid var(--bar-bg); z-index: 1; }
+        #mapWrapper { display: none; position: relative; max-width: 1200px; margin: 0 auto; border-radius: 12px; box-shadow: 0 4px 6px var(--card-shadow); border: 2px solid var(--bar-bg); overflow: hidden; }
+        #mapView { height: 600px; width: 100%; z-index: 1; }
         
-        /* 🌙 ฟิลเตอร์ทำแผนที่ให้เป็นโทนมืดอัตโนมัติเมื่อเปิด Dark Mode */
+        /* แถบแจ้งเตือนตอนรอหมุดแผนที่โหลด */
+        #mapLoadingOverlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--map-loading-bg);
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
         body.dark-mode .leaflet-layer,
         body.dark-mode .leaflet-control-zoom-in,
         body.dark-mode .leaflet-control-zoom-out,
@@ -113,16 +128,15 @@
     
     <div class="summary-container" id="summaryContainer"></div>
     
-    <!-- 🗂️ คอนเทนเนอร์แบบตารางการ์ด (อันเดิม) -->
     <div class="grid" id="dashboard"></div>
     
-    <!-- 🗺️ คอนเทนเนอร์สำหรับแผนที่ (อันใหม่) -->
-    <div id="mapView"></div>
+    <!-- 🗺️ คอนเทนเนอร์สำหรับแผนที่ พร้อม Loading Overlay -->
+    <div id="mapWrapper">
+        <div id="mapLoadingOverlay">⏳ กำลังดึงข้อมูลพิกัดและสถานะสถานี...</div>
+        <div id="mapView"></div>
+    </div>
 
     <script>
-        // -----------------------------------------
-        // 🌙 ระบบสลับ Dark / Light Mode
-        // -----------------------------------------
         const toggleBtn = document.getElementById('themeToggle');
         if (localStorage.getItem('theme') === 'dark') { document.body.classList.add('dark-mode'); toggleBtn.innerText = '☀️'; }
         toggleBtn.addEventListener('click', () => {
@@ -131,9 +145,6 @@
             else { localStorage.setItem('theme', 'light'); toggleBtn.innerText = '🌙'; }
         });
 
-        // -----------------------------------------
-        // 🔊 ระบบเสียงแจ้งเตือน
-        // -----------------------------------------
         let soundMode = 0; 
         const soundToggleBtn = document.getElementById('soundToggle');
         const ackBtn = document.getElementById('ackBtn');
@@ -150,28 +161,29 @@
         ackBtn.addEventListener('click', () => { longSound.pause(); longSound.currentTime = 0; ackBtn.style.display = 'none'; });
 
         // -----------------------------------------
-        // 🗺️ ระบบสลับมุมมอง แผนที่ / การ์ด
+        // 🗺️ ระบบแผนที่
         // -----------------------------------------
         let isMapView = false;
         let map;
         let mapMarkers = [];
+        let lastGroupsData = {}; 
         
-        // พิกัดของแต่ละสถานีหลัก
         const stationCoords = {
-            "สทิงพระ": [7.451303, 100.452018],
-            "นราธิวาส": [6.440840, 101.791666],
-            "หาดใหญ่": [6.939701, 100.392371],
-            "สุราษฎร์ธานี": [9.133966, 99.151892],
-            "ชุมพร": [10.498577, 99.188507]
+            "สทิงพระ": [7.474, 100.437],
+            "นราธิวาส": [6.425, 101.822],
+            "หาดใหญ่": [6.929, 100.435],
+            "สุราษธานี": [9.133, 99.146],
+            "สุราษฎร์ธานี": [9.133, 99.146], 
+            "ชุมพร": [10.493, 99.180]
         };
 
         const viewToggleBtn = document.getElementById('viewToggle');
         const dashboardDiv = document.getElementById('dashboard');
-        const mapViewDiv = document.getElementById('mapView');
+        const mapWrapper = document.getElementById('mapWrapper');
+        const mapLoadingOverlay = document.getElementById('mapLoadingOverlay');
 
         function initMap() {
             if (!map) {
-                // ตั้งค่าจุดศูนย์กลางแผนที่ให้อยู่บริเวณภาคใต้
                 map = L.map('mapView').setView([8.5, 100.0], 6);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '© OpenStreetMap TMD Radar'
@@ -184,23 +196,42 @@
             if (isMapView) {
                 viewToggleBtn.innerHTML = '🗂️ แบบการ์ด';
                 dashboardDiv.style.display = 'none';
-                mapViewDiv.style.display = 'block';
+                mapWrapper.style.display = 'block';
                 initMap();
-                setTimeout(() => map.invalidateSize(), 100); // แก้บั๊กจอดำเมื่อซ่อน/แสดงแผนที่
+                
+                // ถ้ารับข้อมูลมาแล้ว ให้ลบ overlay ออกและวาดหมุด
+                if (Object.keys(lastGroupsData).length > 0) {
+                    mapLoadingOverlay.style.display = 'none';
+                    updateMapMarkers(lastGroupsData);
+                } else {
+                    mapLoadingOverlay.style.display = 'flex'; // ถ้าข้อมูลยังไม่มา ให้โชว์ overlay
+                }
+                
+                setTimeout(() => map.invalidateSize(), 100);
             } else {
                 viewToggleBtn.innerHTML = '🗺️ แผนที่';
                 dashboardDiv.style.display = 'grid';
-                mapViewDiv.style.display = 'none';
+                mapWrapper.style.display = 'none';
             }
         });
 
         // -----------------------------------------
-        // ⏳ ระบบตัวนับเวลาถอยหลัง
+        // ⏳ ตัวนับเวลาถอยหลัง และดึงข้อมูล
         // -----------------------------------------
         let previousStateString = null;
         let countdownTime = 180;
         let timerInterval;
-        let lastGroupsData = {}; // เก็บข้อมูลอัปเดตไว้ใส่แผนที่
+
+        function formatDelayTime(delayMinutes) {
+            let d = Math.floor(delayMinutes / 1440);
+            let h = Math.floor((delayMinutes % 1440) / 60);
+            let m = Math.floor(delayMinutes % 60);
+            let timeStr = "";
+            if (d > 0) timeStr += d + " วัน ";
+            if (h > 0) timeStr += h + " ชม. ";
+            timeStr += m + " นาที";
+            return timeStr.trim();
+        }
 
         function startCountdown() {
             clearInterval(timerInterval);
@@ -223,9 +254,6 @@
             }, 1000);
         }
 
-        // -----------------------------------------
-        // 📡 ระบบดึงข้อมูลหลัก
-        // -----------------------------------------
         function fetchData() {
             fetch('data.json?t=' + new Date().getTime())
                 .then(response => response.json())
@@ -248,27 +276,26 @@
 
                     data.stations.forEach(st => {
                         const baseName = st.name.split(' ')[0];
-                        if (!groups[baseName]) groups[baseName] = { total: 0, offline: 0 };
+                        if (!groups[baseName]) {
+                            groups[baseName] = { total: 0, offline: 0, offlineDetails: [] };
+                        }
                         groups[baseName].total += 1;
                         
                         const isOnline = st.status === 'online';
-                        if (!isOnline) groups[baseName].offline += 1;
+                        let statusText = 'อัปเดตปกติ';
+                        
+                        if (!isOnline) {
+                            groups[baseName].offline += 1;
+                            const delayMins = st.delay_mins || 0;
+                            const timeStr = formatDelayTime(delayMins);
+                            statusText = `ภาพค้างมาแล้ว ${timeStr}`;
+                            
+                            // เก็บรายละเอียดของสถานีย่อยที่ค้างไว้โชว์ในแผนที่
+                            groups[baseName].offlineDetails.push(`🔴 ${st.name} <br><small style="color:#7f8c8d;">ค้างมาแล้ว: ${timeStr}</small>`);
+                        }
 
                         const statusClass = isOnline ? 'online' : 'offline';
                         const cardClass = isOnline ? '' : 'offline-card';
-                        
-                        let statusText = 'อัปเดตปกติ';
-                        if (!isOnline) {
-                            const delayMinutes = st.delay_mins || 0;
-                            let d = Math.floor(delayMinutes / 1440);
-                            let h = Math.floor((delayMinutes % 1440) / 60);
-                            let m = Math.floor(delayMinutes % 60);
-                            let timeStr = "";
-                            if (d > 0) timeStr += d + " วัน ";
-                            if (h > 0) timeStr += h + " ชม. ";
-                            timeStr += m + " นาที";
-                            statusText = `ภาพค้างมาแล้ว ${timeStr.trim()}`;
-                        }
                         
                         const card = document.createElement('div');
                         card.className = `card ${cardClass}`;
@@ -283,7 +310,7 @@
                         dashboard.appendChild(card);
                     });
 
-                    // อัปเดตข้อมูลป้ายสรุป
+                    // สร้างป้ายสรุป
                     for (const [name, stats] of Object.entries(groups)) {
                         const pill = document.createElement('div');
                         const hasError = stats.offline > 0;
@@ -292,8 +319,11 @@
                         summaryContainer.appendChild(pill);
                     }
                     
-                    // อัปเดตหมุดบนแผนที่
-                    updateMapMarkers(groups);
+                    lastGroupsData = groups;
+                    
+                    // ปิดหน้าจอ Loading แผนที่เมื่อได้ข้อมูล
+                    mapLoadingOverlay.style.display = 'none';
+                    updateMapMarkers(groups); 
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -304,29 +334,35 @@
                 });
         }
 
-        // ฟังก์ชันวาดหมุดบนแผนที่
+        // ฟังก์ชันวาดหมุดบนแผนที่ พร้อมรายละเอียด
         function updateMapMarkers(groups) {
-            if (!map) return; // ถ้าแผนที่ยังไม่ถูกกดเปิดดู ก็ยังไม่ต้องวาด
+            if (!map) return; 
             
-            // ลบหมุดเก่าออกก่อนวาดใหม่
             mapMarkers.forEach(marker => map.removeLayer(marker));
             mapMarkers = [];
 
             for (const [name, stats] of Object.entries(groups)) {
                 if (stationCoords[name]) {
                     const hasError = stats.offline > 0;
-                    const color = hasError ? '#e74c3c' : '#2ecc71'; // แดง / เขียว
+                    const color = hasError ? '#e74c3c' : '#2ecc71'; 
                     
+                    let detailsHtml = "";
+                    if (hasError && stats.offlineDetails.length > 0) {
+                        detailsHtml = `<div style="margin-top:10px; text-align:left; border-top: 1px solid #eee; padding-top: 8px;">`;
+                        detailsHtml += stats.offlineDetails.join('<br><br>');
+                        detailsHtml += `</div>`;
+                    }
+
                     const popupContent = `
-                        <div style="font-family: 'Segoe UI', Tahoma, sans-serif; text-align: center; min-width: 120px;">
-                            <h3 style="margin: 0 0 8px 0; color: #333;">${name}</h3>
-                            <p style="margin: 0; font-weight: bold; color: ${color};">
-                                ${hasError ? '🔴 มีภาพค้าง' : '🟢 อัปเดตปกติ'} (${stats.total - stats.offline}/${stats.total})
+                        <div style="font-family: 'Segoe UI', Tahoma, sans-serif; text-align: center; min-width: 160px;">
+                            <h3 style="margin: 0 0 8px 0; color: #333; font-size: 16px;">📍 ${name}</h3>
+                            <p style="margin: 0; font-weight: bold; color: ${color}; font-size: 14px;">
+                                ${hasError ? 'พบภาพค้าง' : '🟢 อัปเดตปกติทุกจุด'} (${stats.total - stats.offline}/${stats.total})
                             </p>
+                            ${detailsHtml}
                         </div>
                     `;
 
-                    // สร้างหมุดวงกลมสีต่างๆ
                     const marker = L.circleMarker(stationCoords[name], {
                         color: '#ffffff',
                         weight: 2,
@@ -340,7 +376,6 @@
             }
         }
 
-        // โหลดข้อมูลครั้งแรก
         fetchData();
     </script>
 </body>
