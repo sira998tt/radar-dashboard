@@ -86,7 +86,6 @@
 
     <h2>📡 Dashboard ระบบติดตามเรดาร์ตรวจอากาศ</h2>
     
-    <!-- ⏳ แถบเวลาและตัวหนังสือนับถอยหลัง -->
     <div class="progress-container">
         <div class="progress-bar" id="progressBar"></div>
     </div>
@@ -178,11 +177,20 @@
                         const statusClass = isOnline ? 'online' : 'offline';
                         const cardClass = isOnline ? '' : 'offline-card';
                         
-                        // 📌 ดึงเวลาที่ค้างมาแสดงผลให้ชัดเจน
+                        // 📌 แปลงเวลาที่ค้างจากนาที เป็น วัน / ชม / นาที
                         let statusText = 'อัปเดตปกติ';
                         if (!isOnline) {
                             const delayMinutes = st.delay_mins || 0;
-                            statusText = `ภาพค้างมาแล้ว ${delayMinutes} นาที`;
+                            let d = Math.floor(delayMinutes / 1440); // 1 วัน = 1440 นาที
+                            let h = Math.floor((delayMinutes % 1440) / 60);
+                            let m = Math.floor(delayMinutes % 60);
+                            
+                            let timeStr = "";
+                            if (d > 0) timeStr += d + " วัน ";
+                            if (h > 0) timeStr += h + " ชม. ";
+                            timeStr += m + " นาที";
+                            
+                            statusText = `ภาพค้างมาแล้ว ${timeStr.trim()}`;
                         }
                         
                         const card = document.createElement('div');
@@ -211,12 +219,10 @@
                     document.getElementById('countdownText').innerText = '⚠️ เชื่อมต่อขัดข้อง กำลังลองใหม่...';
                 })
                 .finally(() => {
-                    // พอรับข้อมูลเสร็จ หรือรับพัง ก็สั่งให้นับถอยหลังรอบใหม่ทันที
                     startCountdown();
                 });
         }
 
-        // โหลดข้อมูลครั้งแรก และตัวจับเวลาจะดูแลรอบถัดไปเอง
         fetchData();
     </script>
 </body>
