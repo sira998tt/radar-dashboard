@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TMD Radar Status Dashboard</title>
+    <title>TMD Radar Command Center</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -15,12 +15,13 @@
             --text-muted: #7f8c8d;
             --card-bg: #ffffff;
             --card-shadow: rgba(0,0,0,0.05);
-            --card-shadow-hover: rgba(0,0,0,0.1);
+            --card-shadow-hover: rgba(0,0,0,0.15);
             --border-default: #3498db;
             --pill-bg: #ffffff;
             --bar-bg: #e0e0e0;
             --map-loading-bg: rgba(255, 255, 255, 0.8);
             --critical-bg: #fff0f0;
+            --event-bg: #e8f4f8;
         }
 
         body.dark-mode {
@@ -35,56 +36,56 @@
             --bar-bg: #333333;
             --map-loading-bg: rgba(30, 30, 30, 0.8);
             --critical-bg: #3a1515;
+            --event-bg: #1f2933;
         }
 
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 30px; color: var(--text-main); transition: background-color 0.3s, color 0.3s; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 30px; color: var(--text-main); transition: background-color 0.3s, color 0.3s; overflow-x: hidden; }
 
         .top-controls { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 1000; }
-        .control-btn { background: var(--card-bg); border: none; font-size: 15px; font-family: inherit; color: var(--text-main); cursor: pointer; padding: 10px 15px; border-radius: 25px; box-shadow: 0 2px 5px var(--card-shadow); transition: transform 0.2s; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .control-btn { background: var(--card-bg); border: none; font-size: 14px; font-family: inherit; color: var(--text-main); cursor: pointer; padding: 10px 15px; border-radius: 25px; box-shadow: 0 2px 5px var(--card-shadow); transition: transform 0.2s; display: flex; align-items: center; justify-content: center; font-weight: bold; }
         .control-btn:hover { transform: scale(1.05); }
-        .icon-btn { width: 45px; height: 45px; border-radius: 50%; padding: 10px; font-size: 20px; }
+        .icon-btn { width: 45px; height: 45px; border-radius: 50%; padding: 10px; font-size: 18px; }
 
-        #ackBtn { display: none; position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background-color: #e74c3c; color: white; padding: 15px 40px; font-size: 22px; font-weight: bold; border: none; border-radius: 30px; box-shadow: 0 4px 15px rgba(231,76,60,0.6); cursor: pointer; z-index: 9999; animation: pulse 1s infinite; }
+        #ackBtn { display: none; position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background-color: #e74c3c; color: white; padding: 15px 40px; font-size: 20px; font-weight: bold; border: none; border-radius: 30px; box-shadow: 0 4px 15px rgba(231,76,60,0.6); cursor: pointer; z-index: 9999; animation: pulse 1s infinite; }
         @keyframes pulse { 0% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } 100% { transform: translateX(-50%) scale(1); } }
 
-        h2 { text-align: center; margin-bottom: 5px; }
+        h2 { text-align: center; margin-bottom: 5px; font-size: 26px; }
         
         .progress-container { max-width: 1200px; margin: 0 auto 15px auto; background-color: var(--bar-bg); border-radius: 10px; overflow: hidden; height: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
         .progress-bar { height: 100%; width: 100%; background-color: #3498db; transition: width 1s linear; }
-        .update-time { text-align: center; color: var(--text-muted); margin-bottom: 25px; font-size: 14px; }
+        .update-time { text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 14px; }
+
+        /* 📝 แถบประวัติเหตุการณ์ */
+        .event-log-container { max-width: 1200px; margin: 0 auto 20px auto; background: var(--event-bg); border-radius: 10px; padding: 10px 20px; display: flex; align-items: center; box-shadow: inset 0 1px 3px var(--card-shadow); overflow: hidden; white-space: nowrap; }
+        .event-title { font-weight: bold; margin-right: 15px; color: var(--border-default); flex-shrink: 0; }
+        .event-marquee { flex-grow: 1; overflow: hidden; font-size: 14px; }
+        .event-marquee span { display: inline-block; padding-left: 100%; animation: marquee 25s linear infinite; }
+        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
 
         .summary-container { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-width: 1200px; margin: 0 auto 30px auto; }
         .summary-pill { background-color: var(--pill-bg); padding: 10px 18px; border-radius: 25px; font-size: 15px; font-weight: bold; box-shadow: 0 3px 6px var(--card-shadow); border-left: 5px solid #2ecc71; display: flex; align-items: center; gap: 8px; }
         .summary-pill.error { border-left-color: #e74c3c; }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
-        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px var(--card-shadow); text-align: center; transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s; border-top: 4px solid var(--border-default); }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 6px 12px var(--card-shadow-hover); }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px var(--card-shadow); text-align: center; transition: transform 0.2s, box-shadow 0.2s; border-top: 4px solid var(--border-default); display: flex; flex-direction: column; justify-content: space-between; }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 6px 12px var(--card-shadow-hover); }
         .card.offline-card { border-top: 4px solid #e74c3c; }
         
-        /* 🔥 โหมดวิกฤต (ค้างเกิน 3 ชม.) */
-        .card.offline-critical { 
-            border-top: 4px solid #8b0000 !important; 
-            background-color: var(--critical-bg); 
-            animation: shake 2.5s infinite; 
-        }
+        .card.offline-critical { border-top: 4px solid #8b0000 !important; background-color: var(--critical-bg); animation: shake 2.5s infinite; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 2%, 6%, 10% { transform: translateX(-2px); } 4%, 8% { transform: translateX(2px); } 12% { transform: translateX(0); } }
         
-        /* อนิเมชันสั่นเตือน */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            2%, 6%, 10% { transform: translateX(-2px); }
-            4%, 8% { transform: translateX(2px); }
-            12% { transform: translateX(0); }
-        }
+        /* 🖼️ พรีวิวเรดาร์ย่อส่วน */
+        .radar-preview { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; margin: 10px 0; border: 1px solid var(--bar-bg); background-color: var(--bar-bg); }
+        .offline-img { filter: grayscale(100%) opacity(70%); }
         
-        .status-dot { height: 16px; width: 16px; border-radius: 50%; display: inline-block; margin-right: 8px; vertical-align: -2px; }
+        .status-dot { height: 14px; width: 14px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: -1px; }
         .online { background-color: #2ecc71; box-shadow: 0 0 10px #2ecc71; }
         .offline { background-color: #e74c3c; box-shadow: 0 0 10px #e74c3c; animation: blink 1s infinite; }
         
-        .st-name { font-size: 20px; font-weight: bold; margin: 15px 0 10px; color: var(--text-main); }
-        .st-link { text-decoration: none; color: #fff; background-color: #3498db; padding: 8px 15px; border-radius: 20px; font-size: 13px; display: inline-block; transition: background 0.2s; }
+        .st-name { font-size: 18px; font-weight: bold; margin: 5px 0; color: var(--text-main); text-align: left; }
+        .st-link { text-decoration: none; color: #fff; background-color: #3498db; padding: 8px 10px; border-radius: 8px; font-size: 13px; display: inline-block; width: 100%; box-sizing: border-box; transition: background 0.2s; }
         .st-link:hover { background-color: #2980b9; }
-        .status-text { color: var(--text-muted); font-size: 14px; font-weight: 500; }
+        .status-text { color: var(--text-muted); font-size: 13px; font-weight: 500; }
         
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
@@ -105,9 +106,9 @@
         @media (max-width: 600px) {
             h2 { font-size: 20px; margin-top: 45px; }
             .top-controls { top: 10px; right: 10px; gap: 5px; }
-            .control-btn { padding: 8px 12px; font-size: 13px; }
-            .icon-btn { width: 35px; height: 35px; font-size: 16px; }
-            #ackBtn { width: 90%; font-size: 18px; padding: 15px 20px; }
+            .control-btn { padding: 6px 10px; font-size: 12px; }
+            .icon-btn { width: 30px; height: 30px; font-size: 14px; }
+            #ackBtn { width: 90%; font-size: 16px; padding: 12px 15px; }
             #mapView { height: 400px; }
         }
     </style>
@@ -117,6 +118,7 @@
     <button id="ackBtn">🛑 ปิดเสียงเตือน (รับทราบ)</button>
 
     <div class="top-controls">
+        <button class="control-btn" id="tvToggle" title="เปิดโหมดเต็มจอสำหรับทีวี">📺 โหมดทีวี</button>
         <button class="control-btn" id="viewToggle" title="สลับมุมมองแผนที่/การ์ด">🗺️ แผนที่</button>
         <button class="control-btn" id="soundToggle" title="สลับโหมดแจ้งเตือน">🔕 ปิดเสียง</button>
         <button class="control-btn icon-btn" id="themeToggle" title="สลับโหมดสว่าง/มืด">🌙</button>
@@ -130,12 +132,18 @@
     <div class="update-time">
         <span id="lastUpdate">กำลังเชื่อมต่อข้อมูลล่าสุด...</span> | <span id="countdownText">เตรียมดึงข้อมูล...</span>
     </div>
+
+    <!-- 📝 แถบประวัติเหตุการณ์ -->
+    <div class="event-log-container">
+        <div class="event-title">🔔 ประวัติล่าสุด:</div>
+        <div class="event-marquee"><span id="eventTicker">รอรับข้อมูลเหตุการณ์...</span></div>
+    </div>
     
     <div class="summary-container" id="summaryContainer"></div>
     <div class="grid" id="dashboard"></div>
     
     <div id="mapWrapper">
-        <div id="mapLoadingOverlay">⏳ กำลังดึงข้อมูลพิกัดและสถานะสถานี...</div>
+        <div id="mapLoadingOverlay">⏳ กำลังเตรียมแผนที่และพิกัด...</div>
         <div id="mapView"></div>
     </div>
 
@@ -149,18 +157,45 @@
         });
 
         // -----------------------------------------
-        // 🔊 ปรับแต่งระดับเสียงและไฟล์เสียงใหม่
+        // 📺 โหมดทีวี (เต็มจอ & เลื่อนออโต้)
+        // -----------------------------------------
+        let isTvMode = false;
+        let tvInterval;
+        const tvToggleBtn = document.getElementById('tvToggle');
+        
+        tvToggleBtn.addEventListener('click', () => {
+            if (!isTvMode) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+                isTvMode = true;
+                tvToggleBtn.innerText = '💻 ออกจากทีวี';
+                tvToggleBtn.style.backgroundColor = '#f39c12';
+                tvToggleBtn.style.color = 'white';
+                
+                // สลับหน้า ทุก 30 วินาที
+                tvInterval = setInterval(() => {
+                    document.getElementById('viewToggle').click();
+                }, 30000);
+            } else {
+                document.exitFullscreen();
+                isTvMode = false;
+                tvToggleBtn.innerText = '📺 โหมดทีวี';
+                tvToggleBtn.style.backgroundColor = 'var(--card-bg)';
+                tvToggleBtn.style.color = 'var(--text-main)';
+                clearInterval(tvInterval);
+            }
+        });
+
+        // -----------------------------------------
+        // 🔊 ระบบเสียงเตือน
         // -----------------------------------------
         let soundMode = 0; 
         const soundToggleBtn = document.getElementById('soundToggle');
         const ackBtn = document.getElementById('ackBtn');
         
-        // เสียงสั้น (ลดเสียงให้เบาลงเหลือ 30%)
-        const shortSound = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-        shortSound.volume = 0.8;
+        const shortSound = new Audio('https://actions.google.com/sounds/v1/water/sonar_ping.ogg');
+        shortSound.volume = 0.5;
         
-        // เสียงยาว (ใช้กริ่งนาฬิกาปลุก และเปิดเสียงสุด 100%)
-        const longSound = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
+        const longSound = new Audio('https://actions.google.com/sounds/v1/emergency/warning_siren.ogg');
         longSound.volume = 1.0;
         longSound.loop = true; 
 
@@ -266,11 +301,20 @@
         }
 
         function fetchData() {
-            fetch('data.json?t=' + new Date().getTime())
+            const cacheBuster = new Date().getTime(); // ป้องกัน Browser Cache ภาพ
+            
+            fetch('data.json?t=' + cacheBuster)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('lastUpdate').innerText = '🔄 อัปเดตข้อมูลบนเซิร์ฟเวอร์ล่าสุดเมื่อ: ' + data.last_update;
                     
+                    // 📌 อัปเดตแถบประวัติเหตุการณ์
+                    if (data.recent_events && data.recent_events.length > 0) {
+                        document.getElementById('eventTicker').innerHTML = data.recent_events.join(' &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; ');
+                    } else {
+                        document.getElementById('eventTicker').innerHTML = "✅ ยังไม่มีเหตุการณ์ภาพค้างในระบบ";
+                    }
+
                     const dashboard = document.getElementById('dashboard');
                     const summaryContainer = document.getElementById('summaryContainer');
                     dashboard.innerHTML = ''; 
@@ -294,7 +338,7 @@
                         
                         const isOnline = st.status === 'online';
                         let statusText = 'อัปเดตปกติ';
-                        let isCritical = false; // ตัวแปรเช็ควิกฤต
+                        let isCritical = false; 
                         
                         if (!isOnline) {
                             groups[baseName].offline += 1;
@@ -302,10 +346,7 @@
                             const timeStr = formatDelayTime(delayMins);
                             statusText = `ภาพค้างมาแล้ว ${timeStr}`;
                             
-                            // ⚠️ ถ้าค้างเกิน 180 นาที (3 ชม.) ปรับเป็นวิกฤต
-                            if (delayMins >= 180) {
-                                isCritical = true;
-                            }
+                            if (delayMins >= 180) { isCritical = true; }
                             
                             groups[baseName].offlineDetails.push(`🔴 ${st.name} <br><small style="color:#7f8c8d;">ค้าง: ${timeStr}</small>`);
                         }
@@ -313,20 +354,26 @@
                         const statusClass = isOnline ? 'online' : 'offline';
                         let cardClass = isOnline ? '' : 'offline-card';
                         
-                        // เติมคลาสวิกฤตเข้าไปที่การ์ด ถ้าค้างนาน
                         if (isCritical) {
                             cardClass += ' offline-critical';
                         }
                         
                         const card = document.createElement('div');
                         card.className = `card ${cardClass}`;
+                        
+                        // 🖼️ วาดการ์ดพร้อมใส่รูปพรีวิว (Thumbnail)
                         card.innerHTML = `
                             <div>
-                                <span class="status-dot ${statusClass}"></span>
-                                <span class="status-text" style="${!isOnline ? 'color:#e74c3c; font-weight:bold;' : ''}">${statusText}</span>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div class="st-name">${st.name}</div>
+                                    <div style="text-align: right;">
+                                        <span class="status-dot ${statusClass}"></span>
+                                        <span class="status-text" style="${!isOnline ? 'color:#e74c3c; font-weight:bold;' : ''}">${statusText}</span>
+                                    </div>
+                                </div>
+                                <img src="${st.url}?t=${cacheBuster}" alt="Radar Preview" class="radar-preview ${!isOnline ? 'offline-img' : ''}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x130?text=ไม่มีภาพพรีวิว'">
                             </div>
-                            <div class="st-name">${st.name}</div>
-                            <a href="${st.url}" target="_blank" class="st-link">🔍 ดูภาพเรดาร์ต้นฉบับ</a>
+                            <a href="${st.url}" target="_blank" class="st-link">🔍 เปิดดูภาพขนาดเต็ม</a>
                         `;
                         dashboard.appendChild(card);
                     });
