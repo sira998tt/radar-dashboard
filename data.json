@@ -1,5 +1,5 @@
 {
-  "last_update": "15/11/2026 03:22:49",
+  "last_update": "15/11/2026 03:39:34",
   "archive_base_url": "https://surprised-email-sing-stands.trycloudflare.com",
   "recent_events": [
     "🟢 นราธิวาส (HQ Loop) กลับมาปกติ (23:09 น.)",
@@ -28,7 +28,7 @@
       "name": "สทิงพระ (HQ)",
       "status": "online",
       "url": "https://weather.tmd.go.th/stp/stp240_HQ_latest.jpg",
-      "delay_mins": 10
+      "delay_mins": 0
     },
     {
       "id": "STP_LOOP",
@@ -44,7 +44,7 @@
       "name": "สทิงพระ (HQ Loop)",
       "status": "online",
       "url": "https://weather.tmd.go.th/stp/stpHQloop.gif",
-      "delay_mins": 10
+      "delay_mins": 0
     },
     {
       "id": "NRT",
@@ -52,7 +52,7 @@
       "name": "นราธิวาส",
       "status": "online",
       "url": "https://weather.tmd.go.th/nrt/nrt240_latest.jpg",
-      "delay_mins": 13
+      "delay_mins": 0
     },
     {
       "id": "NRT_HQ",
@@ -60,7 +60,7 @@
       "name": "นราธิวาส (HQ)",
       "status": "online",
       "url": "https://weather.tmd.go.th/nrt/nrt240_HQ_latest.jpg",
-      "delay_mins": 13
+      "delay_mins": 0
     },
     {
       "id": "NRT_LOOP",
@@ -68,7 +68,7 @@
       "name": "นราธิวาส (Loop)",
       "status": "online",
       "url": "https://weather.tmd.go.th/nrt/nrtloop.gif",
-      "delay_mins": 13
+      "delay_mins": 0
     },
     {
       "id": "NRT_HQ_LOOP",
@@ -76,7 +76,7 @@
       "name": "นราธิวาส (HQ Loop)",
       "status": "online",
       "url": "https://weather.tmd.go.th/nrt/nrtHQloop.gif",
-      "delay_mins": 13
+      "delay_mins": 0
     },
     {
       "id": "HYI",
