@@ -389,6 +389,7 @@
         // ⏪ ระบบเล่นภาพเรดาร์ย้อนหลัง (Cloudflare Tunnel Archive Player)
         // -----------------------------------------
         let archiveBaseUrl = "";
+        let isArchiveOnline = false;
         let archiveFrames = [];
         let currentFrameIdx = 0;
         let playTimer = null;
@@ -404,12 +405,82 @@
             return "";
         }
 
-        async function openPlaybackModal(archiveId) {
-            const baseUrl = getEffectiveArchiveBaseUrl();
-            if (!baseUrl) {
-                alert("⚠️ ขณะนี้ยังไม่ได้เชื่อมต่อท่อ Cloudflare Tunnel จากเครื่อง Server (หรือกำลังรออัปเดตลิงก์ใน data.json ครับ)");
-                return;
+        function setArchiveBadgeState(state) {
+            const badge = document.getElementById('archiveStatusBadge');
+            if (!badge) return;
+            if (state === 'checking') {
+                badge.innerHTML = `<span style="color:#f39c12; font-weight:bold;">☁️ คลังภาพย้อนหลัง: กำลังตรวจสอบท่อเชื่อมต่อ...</span>`;
+            } else if (state === 'online') {
+                isArchiveOnline = true;
+                badge.innerHTML = `<span style="color:#2ecc71; font-weight:bold;">☁️ คลังภาพย้อนหลัง: พร้อมใช้งาน</span>`;
+            } else if (state === 'updating') {
+                isArchiveOnline = false;
+                badge.innerHTML = `<span style="color:#e67e22; font-weight:bold;">☁️ คลังภาพย้อนหลัง: กำลังอัปเดตลิงก์ใหม่...</span>`;
+            } else {
+                isArchiveOnline = false;
+                badge.innerHTML = `<span style="color:#e74c3c; font-weight:bold;">☁️ คลังภาพย้อนหลัง: ออฟไลน์ / รอซิงค์ลิงก์ใหม่</span>`;
             }
+        }
+
+        async function tryFetchFreshUrlFromGitHubRaw() {
+            try {
+                const rawRes = await fetch(`https://raw.githubusercontent.com/sira998tt/radar-dashboard/main/data.json?t=${Date.now()}`, { cache: 'no-store' });
+                if (rawRes.ok) {
+                    const freshData = await rawRes.json();
+                    if (freshData.archive_base_url) {
+                        return freshData.archive_base_url.replace(/\/$/, '');
+                    }
+                }
+            } catch (_) {}
+            return "";
+        }
+
+        async function verifyArchiveConnection(candidateUrl) {
+            const urlToTest = (candidateUrl || getEffectiveArchiveBaseUrl()).replace(/\/$/, '');
+            if (!urlToTest) {
+                setArchiveBadgeState('offline');
+                return false;
+            }
+            setArchiveBadgeState('checking');
+            try {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 5000);
+                const res = await fetch(`${urlToTest}/api/status?t=${Date.now()}`, { signal: controller.signal, cache: 'no-store' });
+                clearTimeout(timer);
+                if (res.ok) {
+                    const info = await res.json();
+                    if (info && info.ok) {
+                        archiveBaseUrl = urlToTest;
+                        setArchiveBadgeState('online');
+                        return true;
+                    }
+                }
+            } catch (_) {}
+
+            // 📌 หากลิงก์ใน GitHub Pages ยังเป็นลิงก์เก่าที่เพิ่งรีสตาร์ท ให้ลองดึงลิงก์สดจาก GitHub Raw มาเช็กอีก 1 ครั้ง
+            const rawUrl = await tryFetchFreshUrlFromGitHubRaw();
+            if (rawUrl && rawUrl !== urlToTest) {
+                try {
+                    const controller2 = new AbortController();
+                    const timer2 = setTimeout(() => controller2.abort(), 5000);
+                    const res2 = await fetch(`${rawUrl}/api/status?t=${Date.now()}`, { signal: controller2.signal, cache: 'no-store' });
+                    clearTimeout(timer2);
+                    if (res2.ok) {
+                        const info2 = await res2.json();
+                        if (info2 && info2.ok) {
+                            archiveBaseUrl = rawUrl;
+                            setArchiveBadgeState('online');
+                            return true;
+                        }
+                    }
+                } catch (_) {}
+            }
+
+            setArchiveBadgeState('offline');
+            return false;
+        }
+
+        async function openPlaybackModal(archiveId) {
             stopPlayArchive();
             const sel = document.getElementById('archiveStationSelect');
             if (archiveId && Array.from(sel.options).some(o => o.value === archiveId)) {
@@ -424,17 +495,34 @@
             document.getElementById('playbackModal').classList.remove('active');
         }
 
-        async function onArchiveStationChange() {
+        async function onArchiveStationChange(retried = false) {
             stopPlayArchive();
-            const baseUrl = getEffectiveArchiveBaseUrl();
+            let baseUrl = getEffectiveArchiveBaseUrl();
             const stn = document.getElementById('archiveStationSelect').value;
             const dateSel = document.getElementById('archiveDateSelect');
             dateSel.innerHTML = `<option value="">กำลังโหลดวันที่...</option>`;
             document.getElementById('frameTimeBadge').innerText = "กำลังโหลด...";
 
+            if (!baseUrl) {
+                const ok = await verifyArchiveConnection("");
+                baseUrl = getEffectiveArchiveBaseUrl();
+                if (!ok || !baseUrl) {
+                    dateSel.innerHTML = `<option value="">กำลังรอซิงค์ลิงก์ Tunnel ใหม่...</option>`;
+                    document.getElementById('frameTimeBadge').innerText = "รอซิงค์ลิงก์ใหม่";
+                    archiveFrames = [];
+                    renderCurrentArchiveFrame("⏳ กำลังซิงค์ลิงก์ Cloudflare Tunnel ใหม่หลังรีสตาร์ท (รอประมาณ 1 นาที)...");
+                    return;
+                }
+            }
+
             try {
-                const res = await fetch(`${baseUrl}/api/dates?station=${encodeURIComponent(stn)}`);
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 6000);
+                const res = await fetch(`${baseUrl}/api/dates?station=${encodeURIComponent(stn)}&t=${Date.now()}`, { signal: controller.signal, cache: 'no-store' });
+                clearTimeout(timer);
+                if (!res.ok) throw new Error('Tunnel error');
                 const data = await res.json();
+                setArchiveBadgeState('online');
                 if (!data.dates || data.dates.length === 0) {
                     dateSel.innerHTML = `<option value="">ยังไม่มีภาพเก็บไว้</option>`;
                     archiveFrames = [];
@@ -444,8 +532,19 @@
                 dateSel.innerHTML = data.dates.map(d => `<option value="${d}">${d}</option>`).join('');
                 await loadArchiveFramesForDate();
             } catch (e) {
-                dateSel.innerHTML = `<option value="">เชื่อมต่อ Server ไม่สำเร็จ</option>`;
+                // 📌 ถ้าเชื่อมต่อลิงก์เดิมไม่สำเร็จ (เช่น เพิ่งรีสตาร์ทเซอร์วิสแล้วลิงก์เปลี่ยน) ให้เช็กลิงก์สดจาก GitHub Raw อัตโนมัติ
+                if (!retried) {
+                    setArchiveBadgeState('updating');
+                    const recovered = await verifyArchiveConnection("");
+                    if (recovered) {
+                        return await onArchiveStationChange(true);
+                    }
+                }
+                setArchiveBadgeState('offline');
+                dateSel.innerHTML = `<option value="">เชื่อมต่อ Server ไม่สำเร็จ (รออัปเดตลิงก์)</option>`;
                 document.getElementById('frameTimeBadge').innerText = "เชื่อมต่อไม่ได้";
+                archiveFrames = [];
+                renderCurrentArchiveFrame("⚠️ ท่อเชื่อมต่อกำลังรีสตาร์ทหรือรอซิงค์ลิงก์ใหม่ กรุณารอสักครู่แล้วลองใหม่ครับ");
             }
         }
 
@@ -475,13 +574,15 @@
             }
         }
 
-        function renderCurrentArchiveFrame() {
+        function renderCurrentArchiveFrame(customEmptyMsg) {
             const imgEl = document.getElementById('archivePlayerImg');
             const badgeEl = document.getElementById('frameTimeBadge');
             const dlBtn = document.getElementById('downloadFrameBtn');
             if (!archiveFrames || archiveFrames.length === 0) {
-                imgEl.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='360'><rect width='100%' height='100%' fill='%231a1a1a'/><text x='50%' y='50%' fill='%23999' font-size='18' font-family='Tahoma, sans-serif' text-anchor='middle'>⏳ รอเก็บภาพเรดาร์เฟรมถัดไปเข้าคลัง...</text></svg>";
-                badgeEl.innerText = "ไม่มีข้อมูล";
+                const msg = customEmptyMsg || "⏳ รอเก็บภาพเรดาร์เฟรมถัดไปเข้าคลัง...";
+                const svgStr = `<svg xmlns='http://www.w3.org/2000/svg' width='640' height='360'><rect width='100%' height='100%' fill='#1a1a1a'/><text x='50%' y='50%' fill='#bbbbbb' font-size='16' font-family='Tahoma, sans-serif' text-anchor='middle'>${msg}</text></svg>`;
+                imgEl.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr);
+                if (!customEmptyMsg) badgeEl.innerText = "ไม่มีข้อมูล";
                 dlBtn.href = "#";
                 return;
             }
@@ -583,10 +684,9 @@
                     document.getElementById('lastUpdate').innerText = '🔄 อัปเดตข้อมูลบนเซิร์ฟเวอร์ล่าสุดเมื่อ: ' + data.last_update;
 
                     if (data.archive_base_url) {
-                        archiveBaseUrl = data.archive_base_url;
-                        document.getElementById('archiveStatusBadge').innerHTML = `<span style="color:#2ecc71; font-weight:bold;">☁️ คลังภาพย้อนหลัง: พร้อมใช้งาน</span>`;
+                        verifyArchiveConnection(data.archive_base_url);
                     } else {
-                        document.getElementById('archiveStatusBadge').innerHTML = `<span style="color:#95a5a6;">☁️ คลังภาพย้อนหลัง: รอเชื่อมต่อ Tunnel</span>`;
+                        verifyArchiveConnection("");
                     }
                     
                     if (data.recent_events && data.recent_events.length > 0) {
