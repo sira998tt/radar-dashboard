@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TMD Radar Command Center</title>
+    <title>TMD Radar Monitor</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -22,6 +22,7 @@
             --map-loading-bg: rgba(255, 255, 255, 0.8);
             --critical-bg: #fff0f0;
             --event-bg: #e8f4f8;
+            --modal-bg: #ffffff;
         }
 
         body.dark-mode {
@@ -37,6 +38,7 @@
             --map-loading-bg: rgba(30, 30, 30, 0.8);
             --critical-bg: #3a1515;
             --event-bg: #1f2933;
+            --modal-bg: #1f2428;
         }
 
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 30px; color: var(--text-main); transition: background-color 0.3s, color 0.3s; overflow-x: hidden; }
@@ -75,7 +77,7 @@
         @keyframes shake { 0%, 100% { transform: translateX(0); } 2%, 6%, 10% { transform: translateX(-2px); } 4%, 8% { transform: translateX(2px); } 12% { transform: translateX(0); } }
         
         /* 🖼️ พรีวิวเรดาร์ย่อส่วน */
-        .radar-preview { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; margin: 10px 0; border: 1px solid var(--bar-bg); background-color: var(--bar-bg); }
+        .radar-preview { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; margin: 10px 0; border: 1px solid var(--bar-bg); background-color: var(--bar-bg); cursor: pointer; }
         .offline-img { filter: grayscale(100%) opacity(70%); }
         
         .status-dot { height: 14px; width: 14px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: -1px; }
@@ -83,8 +85,11 @@
         .offline { background-color: #e74c3c; box-shadow: 0 0 10px #e74c3c; animation: blink 1s infinite; }
         
         .st-name { font-size: 18px; font-weight: bold; margin: 5px 0; color: var(--text-main); text-align: left; }
-        .st-link { text-decoration: none; color: #fff; background-color: #3498db; padding: 8px 10px; border-radius: 8px; font-size: 13px; display: inline-block; width: 100%; box-sizing: border-box; transition: background 0.2s; }
+        .card-actions { display: flex; gap: 8px; margin-top: 4px; }
+        .st-link { text-decoration: none; color: #fff; background-color: #3498db; padding: 8px 10px; border-radius: 8px; font-size: 13px; flex: 1; box-sizing: border-box; transition: background 0.2s; border: none; cursor: pointer; font-family: inherit; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
         .st-link:hover { background-color: #2980b9; }
+        .st-link.playback-btn { background-color: #8e44ad; }
+        .st-link.playback-btn:hover { background-color: #732d91; }
         .status-text { color: var(--text-muted); font-size: 13px; font-weight: 500; }
         
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
@@ -103,13 +108,75 @@
             filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
         }
 
+        /* ⏪ หน้าต่าง Modal ดูภาพเรดาร์ย้อนหลัง (Radar Time-Lapse Player) */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.78); z-index: 5000; align-items: center; justify-content: center;
+            padding: 15px; box-sizing: border-box; backdrop-filter: blur(3px);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: var(--modal-bg); color: var(--text-main); width: 100%; max-width: 780px;
+            border-radius: 14px; padding: 18px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; gap: 12px; max-height: 94vh; overflow-y: auto;
+        }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--bar-bg); padding-bottom: 10px;
+        }
+        .modal-header h3 { margin: 0; font-size: 19px; }
+        .modal-close {
+            background: #e74c3c; color: #fff; border: none; width: 34px; height: 34px;
+            border-radius: 50%; font-size: 16px; cursor: pointer; font-weight: bold;
+        }
+        .player-filters {
+            display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;
+        }
+        .player-filters select {
+            padding: 7px 12px; border-radius: 8px; border: 1px solid var(--bar-bg);
+            background: var(--card-bg); color: var(--text-main); font-size: 14px; font-family: inherit;
+        }
+        .player-viewport {
+            position: relative; width: 100%; background: #000; border-radius: 10px;
+            min-height: 320px; max-height: 58vh; display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .player-viewport img {
+            max-width: 100%; max-height: 58vh; object-fit: contain;
+        }
+        .frame-badge {
+            position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.72);
+            color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: bold;
+        }
+        .player-controls {
+            display: flex; flex-direction: column; gap: 10px; background: var(--bg-color);
+            padding: 12px 15px; border-radius: 10px;
+        }
+        .timeline-row {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .timeline-row input[type="range"] {
+            flex: 1; cursor: pointer; accent-color: #8e44ad;
+        }
+        .btn-row {
+            display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center;
+        }
+        .p-btn {
+            background: var(--card-bg); color: var(--text-main); border: 1px solid var(--bar-bg);
+            padding: 7px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: inherit; font-size: 13px;
+        }
+        .p-btn.primary { background: #8e44ad; color: #fff; border-color: #8e44ad; }
+        .p-btn:hover { filter: brightness(0.93); }
+
         @media (max-width: 600px) {
-            h2 { font-size: 20px; margin-top: 45px; }
+            body { padding: 15px; }
+            h2 { font-size: 19px; margin-top: 45px; }
             .top-controls { top: 10px; right: 10px; gap: 5px; }
             .control-btn { padding: 6px 10px; font-size: 12px; }
-            .icon-btn { width: 30px; height: 30px; font-size: 14px; }
+            .icon-btn { width: 32px; height: 32px; font-size: 14px; }
             #ackBtn { width: 90%; font-size: 16px; padding: 12px 15px; }
             #mapView { height: 400px; }
+            .modal-box { padding: 14px; }
+            .player-viewport { min-height: 240px; }
         }
     </style>
 </head>
@@ -131,6 +198,7 @@
     </div>
     <div class="update-time">
         <span id="lastUpdate">กำลังเชื่อมต่อข้อมูลล่าสุด...</span> | <span id="countdownText">เตรียมดึงข้อมูล...</span>
+        <span id="archiveStatusBadge" style="margin-left:8px;"></span>
     </div>
 
     <!-- 📝 แถบประวัติเหตุการณ์ -->
@@ -145,6 +213,63 @@
     <div id="mapWrapper">
         <div id="mapLoadingOverlay">⏳ กำลังเตรียมแผนที่และพิกัด...</div>
         <div id="mapView"></div>
+    </div>
+
+    <!-- ⏪ หน้าต่าง Modal สำหรับดูภาพเรดาร์ย้อนหลัง -->
+    <div class="modal-overlay" id="playbackModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modalTitle">⏪ ดูภาพเรดาร์ย้อนหลัง</h3>
+                <button class="modal-close" onclick="closePlaybackModal()">✕</button>
+            </div>
+
+            <div class="player-filters">
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <label style="font-size:13px; font-weight:bold;">📡 สถานี:</label>
+                    <select id="archiveStationSelect" onchange="onArchiveStationChange()">
+                        <option value="STP_HQ">สทิงพระ (HQ)</option>
+                        <option value="STP">สทิงพระ (ปกติ)</option>
+                        <option value="HYI_HQ">หาดใหญ่ (HQ)</option>
+                        <option value="HYI">หาดใหญ่ (ปกติ)</option>
+                        <option value="NRT_HQ">นราธิวาส (HQ)</option>
+                        <option value="NRT">นราธิวาส (ปกติ)</option>
+                        <option value="SRT_HQ">สุราษฎร์ธานี (HQ)</option>
+                        <option value="SRT">สุราษฎร์ธานี (ปกติ)</option>
+                        <option value="CMP_HQ">ชุมพร (HQ)</option>
+                        <option value="CMP">ชุมพร (ปกติ)</option>
+                    </select>
+
+                    <label style="font-size:13px; font-weight:bold;">📅 วันที่:</label>
+                    <select id="archiveDateSelect" onchange="loadArchiveFramesForDate()">
+                        <option value="">กำลังโหลด...</option>
+                    </select>
+                </div>
+                <span id="frameCountInfo" style="font-size:13px; color:var(--text-muted);"></span>
+            </div>
+
+            <div class="player-viewport">
+                <span class="frame-badge" id="frameTimeBadge">--:-- น.</span>
+                <img id="archivePlayerImg" src="" alt="Radar Playback Frame" />
+            </div>
+
+            <div class="player-controls">
+                <div class="timeline-row">
+                    <span style="font-size:12px; font-weight:bold;">ช่วงเวลา:</span>
+                    <input type="range" id="frameSlider" min="0" max="0" value="0" oninput="onSliderInput(this.value)" />
+                </div>
+                <div class="btn-row">
+                    <div style="display:flex; gap:6px;">
+                        <button class="p-btn" onclick="stepFrame(-1)">⏮ ก่อนหน้า</button>
+                        <button class="p-btn primary" id="playPauseBtn" onclick="togglePlayArchive()">▶️ เล่น (Play)</button>
+                        <button class="p-btn" onclick="stepFrame(1)">ถัดไป ⏭</button>
+                    </div>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <button class="p-btn" id="speedBtn" onclick="cyclePlaybackSpeed()">⚡ ความเร็ว: 1x</button>
+                        <a id="downloadFrameBtn" href="#" target="_blank" download class="p-btn" style="text-decoration:none;">📥 รูปนี้</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -171,7 +296,6 @@
                 tvToggleBtn.style.backgroundColor = '#f39c12';
                 tvToggleBtn.style.color = 'white';
                 
-                // สลับหน้า ทุก 30 วินาที
                 tvInterval = setInterval(() => {
                     document.getElementById('viewToggle').click();
                 }, 30000);
@@ -262,6 +386,156 @@
         });
 
         // -----------------------------------------
+        // ⏪ ระบบเล่นภาพเรดาร์ย้อนหลัง (Cloudflare Tunnel Archive Player)
+        // -----------------------------------------
+        let archiveBaseUrl = "";
+        let archiveFrames = [];
+        let currentFrameIdx = 0;
+        let playTimer = null;
+        let playbackSpeeds = [500, 250, 120];
+        let speedLabels = ["1x", "2x", "4x"];
+        let speedIdx = 0;
+
+        function getEffectiveArchiveBaseUrl() {
+            if (archiveBaseUrl) return archiveBaseUrl.replace(/\/$/, '');
+            if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+                return `http://${location.hostname}:8080`;
+            }
+            return "";
+        }
+
+        async function openPlaybackModal(archiveId) {
+            const baseUrl = getEffectiveArchiveBaseUrl();
+            if (!baseUrl) {
+                alert("⚠️ ขณะนี้ยังไม่ได้เชื่อมต่อท่อ Cloudflare Tunnel จากเครื่อง Server (หรือกำลังรออัปเดตลิงก์ใน data.json ครับ)");
+                return;
+            }
+            stopPlayArchive();
+            const sel = document.getElementById('archiveStationSelect');
+            if (archiveId && Array.from(sel.options).some(o => o.value === archiveId)) {
+                sel.value = archiveId;
+            }
+            document.getElementById('playbackModal').classList.add('active');
+            await onArchiveStationChange();
+        }
+
+        function closePlaybackModal() {
+            stopPlayArchive();
+            document.getElementById('playbackModal').classList.remove('active');
+        }
+
+        async function onArchiveStationChange() {
+            stopPlayArchive();
+            const baseUrl = getEffectiveArchiveBaseUrl();
+            const stn = document.getElementById('archiveStationSelect').value;
+            const dateSel = document.getElementById('archiveDateSelect');
+            dateSel.innerHTML = `<option value="">กำลังโหลดวันที่...</option>`;
+            document.getElementById('frameTimeBadge').innerText = "กำลังโหลด...";
+
+            try {
+                const res = await fetch(`${baseUrl}/api/dates?station=${encodeURIComponent(stn)}`);
+                const data = await res.json();
+                if (!data.dates || data.dates.length === 0) {
+                    dateSel.innerHTML = `<option value="">ยังไม่มีภาพเก็บไว้</option>`;
+                    archiveFrames = [];
+                    renderCurrentArchiveFrame();
+                    return;
+                }
+                dateSel.innerHTML = data.dates.map(d => `<option value="${d}">${d}</option>`).join('');
+                await loadArchiveFramesForDate();
+            } catch (e) {
+                dateSel.innerHTML = `<option value="">เชื่อมต่อ Server ไม่สำเร็จ</option>`;
+                document.getElementById('frameTimeBadge').innerText = "เชื่อมต่อไม่ได้";
+            }
+        }
+
+        async function loadArchiveFramesForDate() {
+            stopPlayArchive();
+            const baseUrl = getEffectiveArchiveBaseUrl();
+            const stn = document.getElementById('archiveStationSelect').value;
+            const dateStr = document.getElementById('archiveDateSelect').value;
+            if (!dateStr) return;
+
+            try {
+                const res = await fetch(`${baseUrl}/api/frames?station=${encodeURIComponent(stn)}&date=${encodeURIComponent(dateStr)}`);
+                const data = await res.json();
+                archiveFrames = (data.frames || []).map(f => ({
+                    ...f,
+                    fullUrl: `${baseUrl}${f.url}`
+                }));
+                const slider = document.getElementById('frameSlider');
+                slider.min = 0;
+                slider.max = Math.max(0, archiveFrames.length - 1);
+                currentFrameIdx = Math.max(0, archiveFrames.length - 1);
+                slider.value = currentFrameIdx;
+                document.getElementById('frameCountInfo').innerText = `มีภาพทั้งหมด ${archiveFrames.length} เฟรม`;
+                renderCurrentArchiveFrame();
+            } catch (e) {
+                document.getElementById('frameCountInfo').innerText = "โหลดเฟรมภาพไม่สำเร็จ";
+            }
+        }
+
+        function renderCurrentArchiveFrame() {
+            const imgEl = document.getElementById('archivePlayerImg');
+            const badgeEl = document.getElementById('frameTimeBadge');
+            const dlBtn = document.getElementById('downloadFrameBtn');
+            if (!archiveFrames || archiveFrames.length === 0) {
+                imgEl.src = 'https://via.placeholder.com/600x400?text=ยังไม่มีภาพเรดาร์ย้อนหลังในวันนี้';
+                badgeEl.innerText = "ไม่มีข้อมูล";
+                dlBtn.href = "#";
+                return;
+            }
+            const frame = archiveFrames[currentFrameIdx];
+            imgEl.src = frame.fullUrl;
+            badgeEl.innerText = `🕒 ${frame.time} (${currentFrameIdx + 1}/${archiveFrames.length})`;
+            dlBtn.href = frame.fullUrl;
+            document.getElementById('frameSlider').value = currentFrameIdx;
+        }
+
+        function onSliderInput(val) {
+            stopPlayArchive();
+            currentFrameIdx = parseInt(val, 10) || 0;
+            renderCurrentArchiveFrame();
+        }
+
+        function stepFrame(delta) {
+            stopPlayArchive();
+            if (archiveFrames.length === 0) return;
+            currentFrameIdx = (currentFrameIdx + delta + archiveFrames.length) % archiveFrames.length;
+            renderCurrentArchiveFrame();
+        }
+
+        function togglePlayArchive() {
+            if (playTimer) {
+                stopPlayArchive();
+            } else {
+                if (archiveFrames.length <= 1) return;
+                document.getElementById('playPauseBtn').innerText = "⏸ หยุด (Pause)";
+                playTimer = setInterval(() => {
+                    currentFrameIdx = (currentFrameIdx + 1) % archiveFrames.length;
+                    renderCurrentArchiveFrame();
+                }, playbackSpeeds[speedIdx]);
+            }
+        }
+
+        function stopPlayArchive() {
+            if (playTimer) {
+                clearInterval(playTimer);
+                playTimer = null;
+            }
+            document.getElementById('playPauseBtn').innerText = "▶️ เล่น (Play)";
+        }
+
+        function cyclePlaybackSpeed() {
+            speedIdx = (speedIdx + 1) % playbackSpeeds.length;
+            document.getElementById('speedBtn').innerText = `⚡ ความเร็ว: ${speedLabels[speedIdx]}`;
+            if (playTimer) {
+                stopPlayArchive();
+                togglePlayArchive();
+            }
+        }
+
+        // -----------------------------------------
         // ⏳ ตัวนับเวลาถอยหลัง และดึงข้อมูล
         // -----------------------------------------
         let previousStateString = null;
@@ -301,14 +575,20 @@
         }
 
         function fetchData() {
-            const cacheBuster = new Date().getTime(); // ป้องกัน Browser Cache ภาพ
+            const cacheBuster = new Date().getTime();
             
             fetch('data.json?t=' + cacheBuster)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('lastUpdate').innerText = '🔄 อัปเดตข้อมูลบนเซิร์ฟเวอร์ล่าสุดเมื่อ: ' + data.last_update;
+
+                    if (data.archive_base_url) {
+                        archiveBaseUrl = data.archive_base_url;
+                        document.getElementById('archiveStatusBadge').innerHTML = `<span style="color:#2ecc71; font-weight:bold;">☁️ คลังภาพย้อนหลัง: พร้อมใช้งาน</span>`;
+                    } else {
+                        document.getElementById('archiveStatusBadge').innerHTML = `<span style="color:#95a5a6;">☁️ คลังภาพย้อนหลัง: รอเชื่อมต่อ Tunnel</span>`;
+                    }
                     
-                    // 📌 อัปเดตแถบประวัติเหตุการณ์
                     if (data.recent_events && data.recent_events.length > 0) {
                         document.getElementById('eventTicker').innerHTML = data.recent_events.join(' &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; ');
                     } else {
@@ -357,11 +637,12 @@
                         if (isCritical) {
                             cardClass += ' offline-critical';
                         }
+
+                        const archiveTarget = st.archive_id || st.id.replace('_LOOP', '');
                         
                         const card = document.createElement('div');
                         card.className = `card ${cardClass}`;
                         
-                        // 🖼️ วาดการ์ดพร้อมใส่รูปพรีวิว (Thumbnail)
                         card.innerHTML = `
                             <div>
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -371,9 +652,12 @@
                                         <span class="status-text" style="${!isOnline ? 'color:#e74c3c; font-weight:bold;' : ''}">${statusText}</span>
                                     </div>
                                 </div>
-                                <img src="${st.url}?t=${cacheBuster}" alt="Radar Preview" class="radar-preview ${!isOnline ? 'offline-img' : ''}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x130?text=ไม่มีภาพพรีวิว'">
+                                <img src="${st.url}?t=${cacheBuster}" alt="Radar Preview" class="radar-preview ${!isOnline ? 'offline-img' : ''}" loading="lazy" onclick="window.open('${st.url}', '_blank')" onerror="this.src='https://via.placeholder.com/300x130?text=ไม่มีภาพพรีวิว'">
                             </div>
-                            <a href="${st.url}" target="_blank" class="st-link">🔍 เปิดดูภาพขนาดเต็ม</a>
+                            <div class="card-actions">
+                                <a href="${st.url}" target="_blank" class="st-link">🔍 ภาพเต็ม</a>
+                                <button type="button" class="st-link playback-btn" onclick="openPlaybackModal('${archiveTarget}')">⏪ ดูย้อนหลัง</button>
+                            </div>
                         `;
                         dashboard.appendChild(card);
                     });
