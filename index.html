@@ -228,15 +228,15 @@
                     <label style="font-size:13px; font-weight:bold;">📡 สถานี:</label>
                     <select id="archiveStationSelect" onchange="onArchiveStationChange()">
                         <option value="STP_HQ">สทิงพระ (HQ)</option>
-                        <option value="STP">สทิงพระ (ปกติ)</option>
+                        <option value="STP">สทิงพระ</option>
                         <option value="HYI_HQ">หาดใหญ่ (HQ)</option>
-                        <option value="HYI">หาดใหญ่ (ปกติ)</option>
+                        <option value="HYI">หาดใหญ่</option>
                         <option value="NRT_HQ">นราธิวาส (HQ)</option>
-                        <option value="NRT">นราธิวาส (ปกติ)</option>
+                        <option value="NRT">นราธิวาส</option>
                         <option value="SRT_HQ">สุราษฎร์ธานี (HQ)</option>
-                        <option value="SRT">สุราษฎร์ธานี (ปกติ)</option>
+                        <option value="SRT">สุราษฎร์ธานี</option>
                         <option value="CMP_HQ">ชุมพร (HQ)</option>
-                        <option value="CMP">ชุมพร (ปกติ)</option>
+                        <option value="CMP">ชุมพร</option>
                     </select>
 
                     <label style="font-size:13px; font-weight:bold;">📅 วันที่:</label>
@@ -480,7 +480,7 @@
             const badgeEl = document.getElementById('frameTimeBadge');
             const dlBtn = document.getElementById('downloadFrameBtn');
             if (!archiveFrames || archiveFrames.length === 0) {
-                imgEl.src = 'https://via.placeholder.com/600x400?text=ยังไม่มีภาพเรดาร์ย้อนหลังในวันนี้';
+                imgEl.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='360'><rect width='100%' height='100%' fill='%231a1a1a'/><text x='50%' y='50%' fill='%23999' font-size='18' font-family='Tahoma, sans-serif' text-anchor='middle'>⏳ รอเก็บภาพเรดาร์เฟรมถัดไปเข้าคลัง...</text></svg>";
                 badgeEl.innerText = "ไม่มีข้อมูล";
                 dlBtn.href = "#";
                 return;
@@ -638,7 +638,12 @@
                             cardClass += ' offline-critical';
                         }
 
+                        const isLoopCard = st.id.includes('_LOOP');
                         const archiveTarget = st.archive_id || st.id.replace('_LOOP', '');
+                        const actionButtonsHtml = isLoopCard
+                            ? `<a href="${st.url}" target="_blank" class="st-link">🎬 ดูภาพเคลื่อนไหว (GIF)</a>`
+                            : `<a href="${st.url}" target="_blank" class="st-link">🔍 ภาพเต็ม</a>
+                               <button type="button" class="st-link playback-btn" onclick="openPlaybackModal('${archiveTarget}')">⏪ ดูย้อนหลัง</button>`;
                         
                         const card = document.createElement('div');
                         card.className = `card ${cardClass}`;
@@ -652,11 +657,10 @@
                                         <span class="status-text" style="${!isOnline ? 'color:#e74c3c; font-weight:bold;' : ''}">${statusText}</span>
                                     </div>
                                 </div>
-                                <img src="${st.url}?t=${cacheBuster}" alt="Radar Preview" class="radar-preview ${!isOnline ? 'offline-img' : ''}" loading="lazy" onclick="window.open('${st.url}', '_blank')" onerror="this.src='https://via.placeholder.com/300x130?text=ไม่มีภาพพรีวิว'">
+                                <img src="${st.url}?t=${cacheBuster}" alt="Radar Preview" class="radar-preview ${!isOnline ? 'offline-img' : ''}" loading="lazy" onclick="window.open('${st.url}', '_blank')" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'130\'><rect width=\'100%\' height=\'100%\' fill=\'%232a2a2a\'/><text x=\'50%\' y=\'50%\' fill=\'%23888\' font-size=\'14\' font-family=\'Tahoma\' text-anchor=\'middle\'>ไม่มีภาพพรีวิว</text></svg>'">
                             </div>
                             <div class="card-actions">
-                                <a href="${st.url}" target="_blank" class="st-link">🔍 ภาพเต็ม</a>
-                                <button type="button" class="st-link playback-btn" onclick="openPlaybackModal('${archiveTarget}')">⏪ ดูย้อนหลัง</button>
+                                ${actionButtonsHtml}
                             </div>
                         `;
                         dashboard.appendChild(card);
