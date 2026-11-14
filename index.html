@@ -65,8 +65,12 @@
         @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
 
         .summary-container { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-width: 1200px; margin: 0 auto 30px auto; }
-        .summary-pill { background-color: var(--pill-bg); padding: 10px 18px; border-radius: 25px; font-size: 15px; font-weight: bold; box-shadow: 0 3px 6px var(--card-shadow); border-left: 5px solid #2ecc71; display: flex; align-items: center; gap: 8px; }
-        .summary-pill.error { border-left-color: #e74c3c; }
+        .summary-pill { background-color: var(--pill-bg); padding: 10px 18px; border-radius: 25px; font-size: 15px; font-weight: bold; box-shadow: 0 3px 6px var(--card-shadow); border-left: 5px solid #2ecc71; display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s; }
+        .summary-pill:hover { transform: translateY(-2px); box-shadow: 0 5px 12px var(--card-shadow-hover); }
+        .summary-pill:active { transform: scale(0.97); }
+        .summary-pill.error { border-left-color: #e74c3c; background-color: var(--critical-bg); animation: pillPulse 2s infinite; }
+        @keyframes pillPulse { 0%, 100% { box-shadow: 0 3px 6px var(--card-shadow); } 50% { box-shadow: 0 0 12px rgba(231, 76, 60, 0.55); } }
+        .card.scroll-highlight { outline: 3px solid #f39c12; box-shadow: 0 0 18px rgba(243, 156, 18, 0.75) !important; transition: outline 0.3s, box-shadow 0.3s; }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
         .card { background: var(--card-bg); border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px var(--card-shadow); text-align: center; transition: transform 0.2s, box-shadow 0.2s; border-top: 4px solid var(--border-default); display: flex; flex-direction: column; justify-content: space-between; }
@@ -675,6 +679,29 @@
             }, 1000);
         }
 
+        function scrollToStationGroup(baseName) {
+            // หากเปิดมุมมองแผนที่อยู่ ให้สลับกลับมาหน้าการ์ดก่อน หรือซูมไปยังจุดสถานีบนแผนที่
+            if (isMapView && map && stationCoords[baseName]) {
+                map.setView(stationCoords[baseName], 8, { animate: true });
+                mapMarkers.forEach(m => {
+                    const latlng = m.getLatLng();
+                    if (latlng.lat === stationCoords[baseName][0] && latlng.lng === stationCoords[baseName][1]) {
+                        m.openPopup();
+                    }
+                });
+                return;
+            }
+            const firstCard = document.getElementById(`station-group-${baseName}`);
+            if (firstCard) {
+                firstCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const groupCards = document.querySelectorAll(`.card[data-station-group="${baseName}"]`);
+                groupCards.forEach(c => c.classList.add('scroll-highlight'));
+                setTimeout(() => {
+                    groupCards.forEach(c => c.classList.remove('scroll-highlight'));
+                }, 1800);
+            }
+        }
+
         function fetchData() {
             const cacheBuster = new Date().getTime();
             
@@ -709,70 +736,112 @@
                     }
                     previousStateString = currentStateString;
 
+                    let groupOrderCounter = 0;
                     data.stations.forEach(st => {
                         const baseName = st.name.split(' ')[0];
                         if (!groups[baseName]) {
-                            groups[baseName] = { total: 0, offline: 0, offlineDetails: [] };
+                            groups[baseName] = {
+                                total: 0,
+                                offline: 0,
+                                maxDelay: 0,
+                                originalIndex: groupOrderCounter++,
+                                offlineDetails: [],
+                                stations: []
+                            };
                         }
                         groups[baseName].total += 1;
-                        
+                        groups[baseName].stations.push(st);
+
                         const isOnline = st.status === 'online';
-                        let statusText = 'อัปเดตปกติ';
-                        let isCritical = false; 
-                        
                         if (!isOnline) {
                             groups[baseName].offline += 1;
                             const delayMins = st.delay_mins || 0;
+                            if (delayMins > groups[baseName].maxDelay) {
+                                groups[baseName].maxDelay = delayMins;
+                            }
                             const timeStr = formatDelayTime(delayMins);
-                            statusText = `ภาพค้างมาแล้ว ${timeStr}`;
-                            
-                            if (delayMins >= 180) { isCritical = true; }
-                            
                             groups[baseName].offlineDetails.push(`🔴 ${st.name} <br><small style="color:#7f8c8d;">ค้าง: ${timeStr}</small>`);
                         }
-
-                        const statusClass = isOnline ? 'online' : 'offline';
-                        let cardClass = isOnline ? '' : 'offline-card';
-                        
-                        if (isCritical) {
-                            cardClass += ' offline-critical';
-                        }
-
-                        const isLoopCard = st.id.includes('_LOOP');
-                        const archiveTarget = st.archive_id || st.id.replace('_LOOP', '');
-                        const actionButtonsHtml = isLoopCard
-                            ? `<a href="${st.url}" target="_blank" class="st-link">🎬 ดูภาพเคลื่อนไหว (GIF)</a>`
-                            : `<a href="${st.url}" target="_blank" class="st-link">🔍 ภาพเต็ม</a>
-                               <button type="button" class="st-link playback-btn" onclick="openPlaybackModal('${archiveTarget}')">⏪ ดูย้อนหลัง</button>`;
-                        
-                        const card = document.createElement('div');
-                        card.className = `card ${cardClass}`;
-                        
-                        card.innerHTML = `
-                            <div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <div class="st-name">${st.name}</div>
-                                    <div style="text-align: right;">
-                                        <span class="status-dot ${statusClass}"></span>
-                                        <span class="status-text" style="${!isOnline ? 'color:#e74c3c; font-weight:bold;' : ''}">${statusText}</span>
-                                    </div>
-                                </div>
-                                <img src="${st.url}?t=${cacheBuster}" alt="Radar Preview" class="radar-preview ${!isOnline ? 'offline-img' : ''}" loading="lazy" onclick="window.open('${st.url}', '_blank')" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'130\'><rect width=\'100%\' height=\'100%\' fill=\'%232a2a2a\'/><text x=\'50%\' y=\'50%\' fill=\'%23888\' font-size=\'14\' font-family=\'Tahoma\' text-anchor=\'middle\'>ไม่มีภาพพรีวิว</text></svg>'">
-                            </div>
-                            <div class="card-actions">
-                                ${actionButtonsHtml}
-                            </div>
-                        `;
-                        dashboard.appendChild(card);
                     });
 
-                    for (const [name, stats] of Object.entries(groups)) {
+                    // 📌 แนวทางที่ 1: จัดเรียงกลุ่มสถานี (ยกแถว 4 ใบ) ดันสถานีที่มีภาพค้างขึ้นบนสุด
+                    // หากค้างหลายสถานี ให้เรียงตามจำนวนการ์ดที่ค้างและเวลาที่ค้างนานที่สุดก่อน ส่วนสถานีปกติเรียงตามลำดับเดิม
+                    const sortedGroupEntries = Object.entries(groups).sort((a, b) => {
+                        const statsA = a[1];
+                        const statsB = b[1];
+                        const aHasErr = statsA.offline > 0 ? 1 : 0;
+                        const bHasErr = statsB.offline > 0 ? 1 : 0;
+                        if (aHasErr !== bHasErr) return bHasErr - aHasErr;
+                        if (aHasErr && bHasErr) {
+                            if (statsB.offline !== statsA.offline) return statsB.offline - statsA.offline;
+                            if (statsB.maxDelay !== statsA.maxDelay) return statsB.maxDelay - statsA.maxDelay;
+                        }
+                        return statsA.originalIndex - statsB.originalIndex;
+                    });
+
+                    // วาดการ์ดตามลำดับกลุ่มที่จัดเรียงแล้ว (ยกแถว 4 ใบ)
+                    sortedGroupEntries.forEach(([baseName, groupStats]) => {
+                        groupStats.stations.forEach((st, idx) => {
+                            const isOnline = st.status === 'online';
+                            let statusText = 'อัปเดตปกติ';
+                            let isCritical = false;
+
+                            if (!isOnline) {
+                                const delayMins = st.delay_mins || 0;
+                                const timeStr = formatDelayTime(delayMins);
+                                statusText = `ภาพค้างมาแล้ว ${timeStr}`;
+                                if (delayMins >= 180) { isCritical = true; }
+                            }
+
+                            const statusClass = isOnline ? 'online' : 'offline';
+                            let cardClass = isOnline ? '' : 'offline-card';
+                            if (isCritical) {
+                                cardClass += ' offline-critical';
+                            }
+
+                            const isLoopCard = st.id.includes('_LOOP');
+                            const archiveTarget = st.archive_id || st.id.replace('_LOOP', '');
+                            const actionButtonsHtml = isLoopCard
+                                ? `<a href="${st.url}" target="_blank" class="st-link">🎬 ดูภาพเคลื่อนไหว (GIF)</a>`
+                                : `<a href="${st.url}" target="_blank" class="st-link">🔍 ภาพเต็ม</a>
+                                   <button type="button" class="st-link playback-btn" onclick="openPlaybackModal('${archiveTarget}')">⏪ ดูย้อนหลัง</button>`;
+
+                            const card = document.createElement('div');
+                            card.className = `card ${cardClass}`;
+                            card.setAttribute('data-station-group', baseName);
+                            if (idx === 0) {
+                                card.id = `station-group-${baseName}`;
+                            }
+
+                            card.innerHTML = `
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <div class="st-name">${st.name}</div>
+                                        <div style="text-align: right;">
+                                            <span class="status-dot ${statusClass}"></span>
+                                            <span class="status-text" style="${!isOnline ? 'color:#e74c3c; font-weight:bold;' : ''}">${statusText}</span>
+                                        </div>
+                                    </div>
+                                    <img src="${st.url}?t=${cacheBuster}" alt="Radar Preview" class="radar-preview ${!isOnline ? 'offline-img' : ''}" loading="lazy" onclick="window.open('${st.url}', '_blank')" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'130\'><rect width=\'100%\' height=\'100%\' fill=\'%232a2a2a\'/><text x=\'50%\' y=\'50%\' fill=\'%23888\' font-size=\'14\' font-family=\'Tahoma\' text-anchor=\'middle\'>ไม่มีภาพพรีวิว</text></svg>'">
+                                </div>
+                                <div class="card-actions">
+                                    ${actionButtonsHtml}
+                                </div>
+                            `;
+                            dashboard.appendChild(card);
+                        });
+                    });
+
+                    // 📌 แนวทางที่ 3: ปุ่มสรุปสถานะด้านบน (เรียงสถานีที่ค้างไว้ซ้ายสุด และคลิกเพื่อเลื่อนหน้าจอไปหาแถวสถานีนั้นได้ทันที)
+                    sortedGroupEntries.forEach(([name, stats]) => {
                         const pill = document.createElement('div');
                         const hasError = stats.offline > 0;
                         pill.className = `summary-pill ${hasError ? 'error' : ''}`;
+                        pill.title = `คลิกเพื่อเลื่อนไปยังแถวเรดาร์${name}`;
                         pill.innerHTML = hasError ? `🔴 ${name} (${stats.total - stats.offline}/${stats.total})` : `🟢 ${name} (${stats.total}/${stats.total})`;
+                        pill.addEventListener('click', () => scrollToStationGroup(name));
                         summaryContainer.appendChild(pill);
-                    }
+                    });
                     
                     lastGroupsData = groups;
                     mapLoadingOverlay.style.display = 'none';
