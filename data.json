@@ -1,5 +1,5 @@
 {
-  "last_update": "15/11/2026 00:00:42",
+  "last_update": "15/11/2026 00:17:29",
   "archive_base_url": "https://surprised-email-sing-stands.trycloudflare.com",
   "recent_events": [
     "🟢 นราธิวาส (HQ Loop) กลับมาปกติ (23:09 น.)",
@@ -28,7 +28,7 @@
       "name": "สทิงพระ (HQ)",
       "status": "online",
       "url": "https://weather.tmd.go.th/stp/stp240_HQ_latest.jpg",
-      "delay_mins": 3
+      "delay_mins": 6
     },
     {
       "id": "STP_LOOP",
@@ -44,7 +44,7 @@
       "name": "สทิงพระ (HQ Loop)",
       "status": "online",
       "url": "https://weather.tmd.go.th/stp/stpHQloop.gif",
-      "delay_mins": 3
+      "delay_mins": 6
     },
     {
       "id": "NRT",
@@ -84,7 +84,7 @@
       "name": "หาดใหญ่",
       "status": "online",
       "url": "https://weather.tmd.go.th/hyi/hyi240_latest.jpg",
-      "delay_mins": 6
+      "delay_mins": 10
     },
     {
       "id": "HYI_HQ",
@@ -100,7 +100,7 @@
       "name": "หาดใหญ่ (Loop)",
       "status": "online",
       "url": "https://weather.tmd.go.th/hyi/hyiLoop.gif",
-      "delay_mins": 6
+      "delay_mins": 10
     },
     {
       "id": "HYI_HQ_LOOP",
@@ -116,7 +116,7 @@
       "name": "สุราษฎร์ธานี",
       "status": "online",
       "url": "https://weather.tmd.go.th/srt/srt240_latest.png",
-      "delay_mins": 6
+      "delay_mins": 10
     },
     {
       "id": "SRT_HQ",
@@ -132,7 +132,7 @@
       "name": "สุราษฎร์ธานี (Loop)",
       "status": "online",
       "url": "https://weather.tmd.go.th/srt/srtloop.gif",
-      "delay_mins": 6
+      "delay_mins": 10
     },
     {
       "id": "SRT_HQ_LOOP",
@@ -148,7 +148,7 @@
       "name": "ชุมพร",
       "status": "online",
       "url": "https://weather.tmd.go.th/cmp/cmp240_latest.jpg",
-      "delay_mins": 6
+      "delay_mins": 10
     },
     {
       "id": "CMP_HQ",
@@ -156,7 +156,7 @@
       "name": "ชุมพร (HQ)",
       "status": "online",
       "url": "https://weather.tmd.go.th/cmp/cmp240_HQ_latest.jpg",
-      "delay_mins": 6
+      "delay_mins": 10
     },
     {
       "id": "CMP_LOOP",
@@ -164,7 +164,7 @@
       "name": "ชุมพร (Loop)",
       "status": "online",
       "url": "https://weather.tmd.go.th/cmp/cmpLoop.gif",
-      "delay_mins": 6
+      "delay_mins": 10
     },
     {
       "id": "CMP_HQ_LOOP",
@@ -172,7 +172,7 @@
       "name": "ชุมพร (HQ Loop)",
       "status": "online",
       "url": "https://weather.tmd.go.th/cmp/cmpHQloop.gif",
-      "delay_mins": 6
+      "delay_mins": 10
     }
   ]
 }
