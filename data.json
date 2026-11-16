@@ -1,7 +1,9 @@
 {
-  "last_update": "16/11/2026 15:22:30",
+  "last_update": "16/11/2026 15:39:35",
   "archive_base_url": "https://editing-traditional-plastics-bloom.trycloudflare.com",
   "recent_events": [
+    "🟢 สทิงพระ (Loop) กลับมาปกติ (15:39 น.)",
+    "🟢 สทิงพระ กลับมาปกติ (15:39 น.)",
     "🔴 สทิงพระ (HQ Loop) เริ่มค้าง (14:57 น.)",
     "🔴 สทิงพระ (HQ) เริ่มค้าง (14:57 น.)",
     "🔴 สทิงพระ (Loop) เริ่มค้าง (14:53 น.)",
@@ -9,18 +11,16 @@
     "🟢 ชุมพร (HQ) กลับมาปกติ (16:37 น.)",
     "🔴 ชุมพร (HQ) เริ่มค้าง (16:06 น.)",
     "🔴 นราธิวาส (HQ Loop) เริ่มค้าง (13:54 น.)",
-    "🔴 นราธิวาส (Loop) เริ่มค้าง (13:54 น.)",
-    "🔴 นราธิวาส (HQ) เริ่มค้าง (13:54 น.)",
-    "🔴 นราธิวาส เริ่มค้าง (13:54 น.)"
+    "🔴 นราธิวาส (Loop) เริ่มค้าง (13:54 น.)"
   ],
   "stations": [
     {
       "id": "STP",
       "archive_id": "STP",
       "name": "สทิงพระ",
-      "status": "offline",
+      "status": "online",
       "url": "https://weather.tmd.go.th/stp/stp240_latest.jpg",
-      "delay_mins": 28
+      "delay_mins": 0
     },
     {
       "id": "STP_HQ",
@@ -28,15 +28,15 @@
       "name": "สทิงพระ (HQ)",
       "status": "offline",
       "url": "https://weather.tmd.go.th/stp/stp240_HQ_latest.jpg",
-      "delay_mins": 24
+      "delay_mins": 41
     },
     {
       "id": "STP_LOOP",
       "archive_id": "STP",
       "name": "สทิงพระ (Loop)",
-      "status": "offline",
+      "status": "online",
       "url": "https://weather.tmd.go.th/stp/stploop.gif",
-      "delay_mins": 28
+      "delay_mins": 0
     },
     {
       "id": "STP_HQ_LOOP",
@@ -44,7 +44,7 @@
       "name": "สทิงพระ (HQ Loop)",
       "status": "offline",
       "url": "https://weather.tmd.go.th/stp/stpHQloop.gif",
-      "delay_mins": 24
+      "delay_mins": 38
     },
     {
       "id": "NRT",
@@ -52,7 +52,7 @@
       "name": "นราธิวาส",
       "status": "offline",
       "url": "https://weather.tmd.go.th/nrt/nrt240_latest.jpg",
-      "delay_mins": 1527
+      "delay_mins": 1544
     },
     {
       "id": "NRT_HQ",
@@ -60,7 +60,7 @@
       "name": "นราธิวาส (HQ)",
       "status": "offline",
       "url": "https://weather.tmd.go.th/nrt/nrt240_HQ_latest.jpg",
-      "delay_mins": 1527
+      "delay_mins": 1544
     },
     {
       "id": "NRT_LOOP",
@@ -68,7 +68,7 @@
       "name": "นราธิวาส (Loop)",
       "status": "offline",
       "url": "https://weather.tmd.go.th/nrt/nrtloop.gif",
-      "delay_mins": 1527
+      "delay_mins": 1544
     },
     {
       "id": "NRT_HQ_LOOP",
@@ -76,7 +76,7 @@
       "name": "นราธิวาส (HQ Loop)",
       "status": "offline",
       "url": "https://weather.tmd.go.th/nrt/nrtHQloop.gif",
-      "delay_mins": 1527
+      "delay_mins": 1544
     },
     {
       "id": "HYI",
@@ -92,7 +92,7 @@
       "name": "หาดใหญ่ (HQ)",
       "status": "online",
       "url": "https://weather.tmd.go.th/hyi/hyi240_HQ_latest.jpg",
-      "delay_mins": 14
+      "delay_mins": 0
     },
     {
       "id": "HYI_LOOP",
@@ -108,7 +108,7 @@
       "name": "หาดใหญ่ (HQ Loop)",
       "status": "online",
       "url": "https://weather.tmd.go.th/hyi/hyiHQloop.gif",
-      "delay_mins": 14
+      "delay_mins": 0
     },
     {
       "id": "SRT",
