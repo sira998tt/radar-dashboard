@@ -1,17 +1,17 @@
 {
-  "last_update": "17/11/2026 04:02:39",
+  "last_update": "17/11/2026 04:19:40",
   "archive_base_url": "https://editing-traditional-plastics-bloom.trycloudflare.com",
   "recent_events": [
+    "🔴 นราธิวาส (HQ Loop) เริ่มค้าง (03:55 น.)",
+    "🔴 นราธิวาส (Loop) เริ่มค้าง (03:55 น.)",
+    "🔴 นราธิวาส (HQ) เริ่มค้าง (03:55 น.)",
+    "🔴 นราธิวาส เริ่มค้าง (03:55 น.)",
     "🟢 สทิงพระ (HQ Loop) กลับมาปกติ (03:11 น.)",
     "🟢 สทิงพระ (HQ) กลับมาปกติ (03:11 น.)",
     "🟢 สทิงพระ (Loop) กลับมาปกติ (03:08 น.)",
     "🟢 สทิงพระ กลับมาปกติ (03:08 น.)",
     "🔴 สทิงพระ (HQ Loop) เริ่มค้าง (02:40 น.)",
-    "🔴 สทิงพระ (HQ) เริ่มค้าง (02:40 น.)",
-    "🔴 สทิงพระ (Loop) เริ่มค้าง (02:37 น.)",
-    "🔴 สทิงพระ เริ่มค้าง (02:37 น.)",
-    "🟢 ชุมพร (HQ) กลับมาปกติ (01:06 น.)",
-    "🔴 ชุมพร (HQ) เริ่มค้าง (00:38 น.)"
+    "🔴 สทิงพระ (HQ) เริ่มค้าง (02:40 น.)"
   ],
   "stations": [
     {
@@ -50,33 +50,33 @@
       "id": "NRT",
       "archive_id": "NRT",
       "name": "นราธิวาส",
-      "status": "online",
+      "status": "offline",
       "url": "https://weather.tmd.go.th/nrt/nrt240_latest.jpg",
-      "delay_mins": 6
+      "delay_mins": 23
     },
     {
       "id": "NRT_HQ",
       "archive_id": "NRT_HQ",
       "name": "นราธิวาส (HQ)",
-      "status": "online",
+      "status": "offline",
       "url": "https://weather.tmd.go.th/nrt/nrt240_HQ_latest.jpg",
-      "delay_mins": 6
+      "delay_mins": 23
     },
     {
       "id": "NRT_LOOP",
       "archive_id": "NRT",
       "name": "นราธิวาส (Loop)",
-      "status": "online",
+      "status": "offline",
       "url": "https://weather.tmd.go.th/nrt/nrtloop.gif",
-      "delay_mins": 6
+      "delay_mins": 23
     },
     {
       "id": "NRT_HQ_LOOP",
       "archive_id": "NRT_HQ",
       "name": "นราธิวาส (HQ Loop)",
-      "status": "online",
+      "status": "offline",
       "url": "https://weather.tmd.go.th/nrt/nrtHQloop.gif",
-      "delay_mins": 6
+      "delay_mins": 23
     },
     {
       "id": "HYI",
