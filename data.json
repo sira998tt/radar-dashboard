@@ -1,5 +1,5 @@
 {
-  "last_update": "16/11/2026 23:14:25",
+  "last_update": "16/11/2026 23:31:16",
   "archive_base_url": "https://editing-traditional-plastics-bloom.trycloudflare.com",
   "recent_events": [
     "🟢 นราธิวาส (HQ Loop) กลับมาปกติ (18:09 น.)",
@@ -52,7 +52,7 @@
       "name": "นราธิวาส",
       "status": "online",
       "url": "https://weather.tmd.go.th/nrt/nrt240_latest.jpg",
-      "delay_mins": 3
+      "delay_mins": 6
     },
     {
       "id": "NRT_HQ",
@@ -60,7 +60,7 @@
       "name": "นราธิวาส (HQ)",
       "status": "online",
       "url": "https://weather.tmd.go.th/nrt/nrt240_HQ_latest.jpg",
-      "delay_mins": 3
+      "delay_mins": 6
     },
     {
       "id": "NRT_LOOP",
@@ -68,7 +68,7 @@
       "name": "นราธิวาส (Loop)",
       "status": "online",
       "url": "https://weather.tmd.go.th/nrt/nrtloop.gif",
-      "delay_mins": 3
+      "delay_mins": 6
     },
     {
       "id": "NRT_HQ_LOOP",
@@ -76,7 +76,7 @@
       "name": "นราธิวาส (HQ Loop)",
       "status": "online",
       "url": "https://weather.tmd.go.th/nrt/nrtHQloop.gif",
-      "delay_mins": 3
+      "delay_mins": 6
     },
     {
       "id": "HYI",
