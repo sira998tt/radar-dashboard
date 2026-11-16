@@ -1,6 +1,6 @@
 {
-  "last_update": "16/11/2026 11:08:42",
-  "archive_base_url": "https://monsters-its-current-flame.trycloudflare.com",
+  "last_update": "16/11/2026 11:12:37",
+  "archive_base_url": "https://editing-traditional-plastics-bloom.trycloudflare.com",
   "recent_events": [
     "🟢 ชุมพร (HQ) กลับมาปกติ (16:37 น.)",
     "🔴 ชุมพร (HQ) เริ่มค้าง (16:06 น.)",
@@ -20,7 +20,7 @@
       "name": "สทิงพระ",
       "status": "online",
       "url": "https://weather.tmd.go.th/stp/stp240_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 4
     },
     {
       "id": "STP_HQ",
@@ -28,7 +28,7 @@
       "name": "สทิงพระ (HQ)",
       "status": "online",
       "url": "https://weather.tmd.go.th/stp/stp240_HQ_latest.jpg",
-      "delay_mins": 13
+      "delay_mins": 0
     },
     {
       "id": "STP_LOOP",
@@ -36,7 +36,7 @@
       "name": "สทิงพระ (Loop)",
       "status": "online",
       "url": "https://weather.tmd.go.th/stp/stploop.gif",
-      "delay_mins": 0
+      "delay_mins": 4
     },
     {
       "id": "STP_HQ_LOOP",
@@ -44,7 +44,7 @@
       "name": "สทิงพระ (HQ Loop)",
       "status": "online",
       "url": "https://weather.tmd.go.th/stp/stpHQloop.gif",
-      "delay_mins": 13
+      "delay_mins": 0
     },
     {
       "id": "NRT",
@@ -52,7 +52,7 @@
       "name": "นราธิวาส",
       "status": "offline",
       "url": "https://weather.tmd.go.th/nrt/nrt240_latest.jpg",
-      "delay_mins": 1274
+      "delay_mins": 1278
     },
     {
       "id": "NRT_HQ",
@@ -60,7 +60,7 @@
       "name": "นราธิวาส (HQ)",
       "status": "offline",
       "url": "https://weather.tmd.go.th/nrt/nrt240_HQ_latest.jpg",
-      "delay_mins": 1274
+      "delay_mins": 1278
     },
     {
       "id": "NRT_LOOP",
@@ -68,7 +68,7 @@
       "name": "นราธิวาส (Loop)",
       "status": "offline",
       "url": "https://weather.tmd.go.th/nrt/nrtloop.gif",
-      "delay_mins": 1274
+      "delay_mins": 1278
     },
     {
       "id": "NRT_HQ_LOOP",
