@@ -21,6 +21,7 @@
             --bar-bg: #e0e0e0;
             --map-loading-bg: rgba(255, 255, 255, 0.8);
             --critical-bg: #fff0f0;
+            --warning-bg: #fff8e6;
             --event-bg: #e8f4f8;
             --modal-bg: #ffffff;
         }
@@ -37,6 +38,7 @@
             --bar-bg: #333333;
             --map-loading-bg: rgba(30, 30, 30, 0.8);
             --critical-bg: #3a1515;
+            --warning-bg: #33270d;
             --event-bg: #1f2933;
             --modal-bg: #1f2428;
         }
@@ -69,6 +71,8 @@
         .summary-pill:hover { transform: translateY(-2px); box-shadow: 0 5px 12px var(--card-shadow-hover); }
         .summary-pill:active { transform: scale(0.97); }
         .summary-pill.error { border-left-color: #e74c3c; background-color: var(--critical-bg); animation: pillPulse 2s infinite; }
+        .summary-pill.warning { border-left-color: #f39c12; background-color: var(--warning-bg); animation: pillWarnPulse 2.2s infinite; }
+        @keyframes pillWarnPulse { 0%, 100% { box-shadow: 0 3px 6px var(--card-shadow); } 50% { box-shadow: 0 0 12px rgba(243, 156, 18, 0.55); } }
         @keyframes pillPulse { 0%, 100% { box-shadow: 0 3px 6px var(--card-shadow); } 50% { box-shadow: 0 0 12px rgba(231, 76, 60, 0.55); } }
         .card.scroll-highlight { outline: 3px solid #f39c12; box-shadow: 0 0 18px rgba(243, 156, 18, 0.75) !important; transition: outline 0.3s, box-shadow 0.3s; }
 
@@ -76,6 +80,9 @@
         .card { background: var(--card-bg); border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px var(--card-shadow); text-align: center; transition: transform 0.2s, box-shadow 0.2s; border-top: 4px solid var(--border-default); display: flex; flex-direction: column; justify-content: space-between; }
         .card:hover { transform: translateY(-3px); box-shadow: 0 6px 12px var(--card-shadow-hover); }
         .card.offline-card { border-top: 4px solid #e74c3c; }
+        .card.warning-card { border-top: 4px solid #f39c12; background-color: var(--warning-bg); }
+        .warning-banner { background: rgba(243, 156, 18, 0.18); border: 1px solid rgba(243, 156, 18, 0.55); color: #d68910; border-radius: 8px; padding: 6px 8px; font-size: 12px; font-weight: bold; margin: 4px 0 8px 0; text-align: left; line-height: 1.35; }
+        body.dark-mode .warning-banner { color: #f8c471; background: rgba(243, 156, 18, 0.16); }
         
         .card.offline-critical { border-top: 4px solid #8b0000 !important; background-color: var(--critical-bg); animation: shake 2.5s infinite; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 2%, 6%, 10% { transform: translateX(-2px); } 4%, 8% { transform: translateX(2px); } 12% { transform: translateX(0); } }
@@ -87,6 +94,7 @@
         .status-dot { height: 14px; width: 14px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: -1px; }
         .online { background-color: #2ecc71; box-shadow: 0 0 10px #2ecc71; }
         .offline { background-color: #e74c3c; box-shadow: 0 0 10px #e74c3c; animation: blink 1s infinite; }
+        .warning { background-color: #f39c12; box-shadow: 0 0 10px #f39c12; animation: blink 1.5s infinite; }
         
         .st-name { font-size: 18px; font-weight: bold; margin: 5px 0; color: var(--text-main); text-align: left; }
         .card-actions { display: flex; gap: 8px; margin-top: 4px; }
@@ -743,17 +751,20 @@
                             groups[baseName] = {
                                 total: 0,
                                 offline: 0,
+                                warning: 0,
                                 maxDelay: 0,
                                 originalIndex: groupOrderCounter++,
                                 offlineDetails: [],
+                                warningDetails: [],
                                 stations: []
                             };
                         }
                         groups[baseName].total += 1;
                         groups[baseName].stations.push(st);
 
-                        const isOnline = st.status === 'online';
-                        if (!isOnline) {
+                        const isOffline = st.status === 'offline';
+                        const isWarning = st.status === 'warning';
+                        if (isOffline) {
                             groups[baseName].offline += 1;
                             const delayMins = st.delay_mins || 0;
                             if (delayMins > groups[baseName].maxDelay) {
@@ -761,6 +772,10 @@
                             }
                             const timeStr = formatDelayTime(delayMins);
                             groups[baseName].offlineDetails.push(`🔴 ${st.name} <br><small style="color:#7f8c8d;">ค้าง: ${timeStr}</small>`);
+                        } else if (isWarning) {
+                            groups[baseName].warning += 1;
+                            const wDetail = st.warning_detail || 'ไม่พบกลุ่มฝนผิดปกติ • โปรดตรวจสอบ';
+                            groups[baseName].warningDetails.push(`🟡 ${st.name} <br><small style="color:#d68910;">${wDetail}</small>`);
                         }
                     });
 
@@ -769,10 +784,10 @@
                     const sortedGroupEntries = Object.entries(groups).sort((a, b) => {
                         const statsA = a[1];
                         const statsB = b[1];
-                        const aHasErr = statsA.offline > 0 ? 1 : 0;
-                        const bHasErr = statsB.offline > 0 ? 1 : 0;
-                        if (aHasErr !== bHasErr) return bHasErr - aHasErr;
-                        if (aHasErr && bHasErr) {
+                        const prioA = statsA.offline > 0 ? 2 : (statsA.warning > 0 ? 1 : 0);
+                        const prioB = statsB.offline > 0 ? 2 : (statsB.warning > 0 ? 1 : 0);
+                        if (prioA !== prioB) return prioB - prioA;
+                        if (prioA === 2 && prioB === 2) {
                             if (statsB.offline !== statsA.offline) return statsB.offline - statsA.offline;
                             if (statsB.maxDelay !== statsA.maxDelay) return statsB.maxDelay - statsA.maxDelay;
                         }
@@ -782,21 +797,29 @@
                     // วาดการ์ดตามลำดับกลุ่มที่จัดเรียงแล้ว (ยกแถว 4 ใบ)
                     sortedGroupEntries.forEach(([baseName, groupStats]) => {
                         groupStats.stations.forEach((st, idx) => {
-                            const isOnline = st.status === 'online';
+                            const isOffline = st.status === 'offline';
+                            const isWarning = st.status === 'warning';
                             let statusText = 'อัปเดตปกติ';
-                            let isCritical = false;
+                            let statusStyle = '';
+                            let statusClass = 'online';
+                            let cardClass = '';
+                            let warningBannerHtml = '';
 
-                            if (!isOnline) {
+                            if (isOffline) {
                                 const delayMins = st.delay_mins || 0;
                                 const timeStr = formatDelayTime(delayMins);
                                 statusText = `ภาพค้างมาแล้ว ${timeStr}`;
-                                if (delayMins >= 180) { isCritical = true; }
-                            }
-
-                            const statusClass = isOnline ? 'online' : 'offline';
-                            let cardClass = isOnline ? '' : 'offline-card';
-                            if (isCritical) {
-                                cardClass += ' offline-critical';
+                                statusStyle = 'color:#e74c3c; font-weight:bold;';
+                                statusClass = 'offline';
+                                cardClass = 'offline-card';
+                                if (delayMins >= 180) { cardClass += ' offline-critical'; }
+                            } else if (isWarning) {
+                                statusText = 'อัปเดตปกติ • ไม่พบกลุ่มฝน';
+                                statusStyle = 'color:#f39c12; font-weight:bold;';
+                                statusClass = 'warning';
+                                cardClass = 'warning-card';
+                                const detailMsg = st.warning_detail || 'ไม่พบกลุ่มฝนผิดปกติ • โปรดตรวจสอบ';
+                                warningBannerHtml = `<div class="warning-banner">⚠️ ${detailMsg}</div>`;
                             }
 
                             const isLoopCard = st.id.includes('_LOOP');
@@ -815,14 +838,15 @@
 
                             card.innerHTML = `
                                 <div>
-                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
                                         <div class="st-name">${st.name}</div>
                                         <div style="text-align: right;">
                                             <span class="status-dot ${statusClass}"></span>
-                                            <span class="status-text" style="${!isOnline ? 'color:#e74c3c; font-weight:bold;' : ''}">${statusText}</span>
+                                            <span class="status-text" style="${statusStyle}">${statusText}</span>
                                         </div>
                                     </div>
-                                    <img src="${st.url}?t=${cacheBuster}" alt="Radar Preview" class="radar-preview ${!isOnline ? 'offline-img' : ''}" loading="lazy" onclick="window.open('${st.url}', '_blank')" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'130\'><rect width=\'100%\' height=\'100%\' fill=\'%232a2a2a\'/><text x=\'50%\' y=\'50%\' fill=\'%23888\' font-size=\'14\' font-family=\'Tahoma\' text-anchor=\'middle\'>ไม่มีภาพพรีวิว</text></svg>'">
+                                    ${warningBannerHtml}
+                                    <img src="${st.url}?t=${cacheBuster}" alt="Radar Preview" class="radar-preview ${isOffline ? 'offline-img' : ''}" loading="lazy" onclick="window.open('${st.url}', '_blank')" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'130\'><rect width=\'100%\' height=\'100%\' fill=\'%232a2a2a\'/><text x=\'50%\' y=\'50%\' fill=\'%23888\' font-size=\'14\' font-family=\'Tahoma\' text-anchor=\'middle\'>ไม่มีภาพพรีวิว</text></svg>'">
                                 </div>
                                 <div class="card-actions">
                                     ${actionButtonsHtml}
@@ -836,9 +860,16 @@
                     sortedGroupEntries.forEach(([name, stats]) => {
                         const pill = document.createElement('div');
                         const hasError = stats.offline > 0;
-                        pill.className = `summary-pill ${hasError ? 'error' : ''}`;
+                        const hasWarning = stats.warning > 0;
+                        pill.className = `summary-pill ${hasError ? 'error' : (hasWarning ? 'warning' : '')}`;
                         pill.title = `คลิกเพื่อเลื่อนไปยังแถวเรดาร์${name}`;
-                        pill.innerHTML = hasError ? `🔴 ${name} (${stats.total - stats.offline}/${stats.total})` : `🟢 ${name} (${stats.total}/${stats.total})`;
+                        if (hasError) {
+                            pill.innerHTML = `🔴 ${name} (${stats.total - stats.offline}/${stats.total})`;
+                        } else if (hasWarning) {
+                            pill.innerHTML = `🟡 ${name} (โปรดตรวจสอบ)`;
+                        } else {
+                            pill.innerHTML = `🟢 ${name} (${stats.total}/${stats.total})`;
+                        }
                         pill.addEventListener('click', () => scrollToStationGroup(name));
                         summaryContainer.appendChild(pill);
                     });
@@ -865,20 +896,26 @@
             for (const [name, stats] of Object.entries(groups)) {
                 if (stationCoords[name]) {
                     const hasError = stats.offline > 0;
-                    const color = hasError ? '#e74c3c' : '#2ecc71'; 
+                    const hasWarning = stats.warning > 0;
+                    const color = hasError ? '#e74c3c' : (hasWarning ? '#f39c12' : '#2ecc71');
                     
                     let detailsHtml = "";
-                    if (hasError && stats.offlineDetails.length > 0) {
+                    const combinedDetails = [...(stats.offlineDetails || []), ...(stats.warningDetails || [])];
+                    if (combinedDetails.length > 0) {
                         detailsHtml = `<div style="margin-top:10px; text-align:left; border-top: 1px solid #eee; padding-top: 8px;">`;
-                        detailsHtml += stats.offlineDetails.join('<br><br>');
+                        detailsHtml += combinedDetails.join('<br><br>');
                         detailsHtml += `</div>`;
                     }
 
+                    const popupTitle = hasError
+                        ? `🔴 พบภาพค้าง (${stats.total - stats.offline}/${stats.total})`
+                        : (hasWarning ? `🟡 ไม่พบกลุ่มฝนผิดปกติ (โปรดตรวจสอบ)` : `🟢 อัปเดตปกติทุกจุด (${stats.total}/${stats.total})`);
+
                     const popupContent = `
-                        <div style="font-family: 'Segoe UI', Tahoma, sans-serif; text-align: center; min-width: 160px;">
+                        <div style="font-family: 'Segoe UI', Tahoma, sans-serif; text-align: center; min-width: 180px;">
                             <h3 style="margin: 0 0 8px 0; color: #333; font-size: 16px;">📍 ${name}</h3>
                             <p style="margin: 0; font-weight: bold; color: ${color}; font-size: 14px;">
-                                ${hasError ? 'พบภาพค้าง' : '🟢 อัปเดตปกติทุกจุด'} (${stats.total - stats.offline}/${stats.total})
+                                ${popupTitle}
                             </p>
                             ${detailsHtml}
                         </div>
