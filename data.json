@@ -1,6 +1,6 @@
 {
-  "last_update": "20/11/2026 05:47:37",
-  "archive_base_url": "https://deadline-lap-resistance-concentrations.trycloudflare.com",
+  "last_update": "20/11/2026 06:04:04",
+  "archive_base_url": "https://hearing-acrobat-filed-guitars.trycloudflare.com",
   "recent_events": [
     "🟡 ชุมพร (HQ) ผิดปกติ ตรวจไม่พบกลุ่มฝน (19:24 น.)",
     "🟢 ชุมพร (HQ) กลับมาปกติ (13:23 น.)",
@@ -19,46 +19,52 @@
       "archive_id": "STP",
       "name": "สทิงพระ",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stp240_latest.jpg",
-      "delay_mins": 7
+      "delay_mins": 9
     },
     {
       "id": "STP_HQ",
       "archive_id": "STP_HQ",
       "name": "สทิงพระ (HQ)",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stp240_HQ_latest.jpg",
-      "delay_mins": 7
+      "delay_mins": 9
     },
     {
       "id": "STP_LOOP",
       "archive_id": "STP",
       "name": "สทิงพระ (Loop)",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stploop.gif",
-      "delay_mins": 7
+      "delay_mins": 9
     },
     {
       "id": "STP_HQ_LOOP",
       "archive_id": "STP_HQ",
       "name": "สทิงพระ (HQ Loop)",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stpHQloop.gif",
-      "delay_mins": 7
+      "delay_mins": 9
     },
     {
       "id": "NRT",
       "archive_id": "NRT",
       "name": "นราธิวาส",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrt240_latest.jpg",
-      "delay_mins": 7
+      "delay_mins": 9
     },
     {
       "id": "NRT_HQ",
       "archive_id": "NRT_HQ",
       "name": "นราธิวาส (HQ)",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrt240_HQ_latest.jpg",
       "delay_mins": 7
     },
@@ -67,6 +73,7 @@
       "archive_id": "NRT",
       "name": "นราธิวาส (Loop)",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrtloop.gif",
       "delay_mins": 7
     },
@@ -75,6 +82,7 @@
       "archive_id": "NRT_HQ",
       "name": "นราธิวาส (HQ Loop)",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrtHQloop.gif",
       "delay_mins": 7
     },
@@ -83,6 +91,7 @@
       "archive_id": "HYI",
       "name": "หาดใหญ่",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyi240_latest.jpg",
       "delay_mins": 7
     },
@@ -91,6 +100,7 @@
       "archive_id": "HYI_HQ",
       "name": "หาดใหญ่ (HQ)",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyi240_HQ_latest.jpg",
       "delay_mins": 7
     },
@@ -99,6 +109,7 @@
       "archive_id": "HYI",
       "name": "หาดใหญ่ (Loop)",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyiLoop.gif",
       "delay_mins": 7
     },
@@ -107,6 +118,7 @@
       "archive_id": "HYI_HQ",
       "name": "หาดใหญ่ (HQ Loop)",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyiHQloop.gif",
       "delay_mins": 7
     },
@@ -115,14 +127,16 @@
       "archive_id": "SRT",
       "name": "สุราษฎร์ธานี",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srt240_latest.png",
-      "delay_mins": 11
+      "delay_mins": 7
     },
     {
       "id": "SRT_HQ",
       "archive_id": "SRT_HQ",
       "name": "สุราษฎร์ธานี (HQ)",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srt240_HQ_latest.jpg",
       "delay_mins": 7
     },
@@ -131,14 +145,16 @@
       "archive_id": "SRT",
       "name": "สุราษฎร์ธานี (Loop)",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srtloop.gif",
-      "delay_mins": 11
+      "delay_mins": 7
     },
     {
       "id": "SRT_HQ_LOOP",
       "archive_id": "SRT_HQ",
       "name": "สุราษฎร์ธานี (HQ Loop)",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srtHQloop.gif",
       "delay_mins": 7
     },
@@ -147,6 +163,7 @@
       "archive_id": "CMP",
       "name": "ชุมพร",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmp240_latest.jpg",
       "delay_mins": 11
     },
@@ -154,15 +171,17 @@
       "id": "CMP_HQ",
       "archive_id": "CMP_HQ",
       "name": "ชุมพร (HQ)",
-      "status": "online",
+      "status": "warning",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmp240_HQ_latest.jpg",
-      "delay_mins": 11
+      "delay_mins": 7
     },
     {
       "id": "CMP_LOOP",
       "archive_id": "CMP",
       "name": "ชุมพร (Loop)",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmpLoop.gif",
       "delay_mins": 11
     },
@@ -171,8 +190,9 @@
       "archive_id": "CMP_HQ",
       "name": "ชุมพร (HQ Loop)",
       "status": "online",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmpHQloop.gif",
-      "delay_mins": 11
+      "delay_mins": 7
     }
   ]
 }
