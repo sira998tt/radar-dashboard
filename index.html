@@ -756,6 +756,7 @@
                                 originalIndex: groupOrderCounter++,
                                 offlineDetails: [],
                                 warningDetails: [],
+                                groupWarningDetail: '',
                                 stations: []
                             };
                         }
@@ -774,7 +775,10 @@
                             groups[baseName].offlineDetails.push(`🔴 ${st.name} <br><small style="color:#7f8c8d;">ค้าง: ${timeStr}</small>`);
                         } else if (isWarning) {
                             groups[baseName].warning += 1;
-                            const wDetail = st.warning_detail || 'ไม่พบกลุ่มฝนผิดปกติ • โปรดตรวจสอบ';
+                            const wDetail = st.warning_detail || 'ผิดปกติ ไม่พบกลุ่มฝน • โปรดตรวจสอบ';
+                            if (!groups[baseName].groupWarningDetail || st.warning_detail) {
+                                groups[baseName].groupWarningDetail = wDetail;
+                            }
                             groups[baseName].warningDetails.push(`🟡 ${st.name} <br><small style="color:#d68910;">${wDetail}</small>`);
                         }
                     });
@@ -798,7 +802,7 @@
                     sortedGroupEntries.forEach(([baseName, groupStats]) => {
                         groupStats.stations.forEach((st, idx) => {
                             const isOffline = st.status === 'offline';
-                            const isWarning = st.status === 'warning';
+                            const isWarning = !isOffline && (st.status === 'warning' || groupStats.warning > 0);
                             let statusText = 'อัปเดตปกติ';
                             let statusStyle = '';
                             let statusClass = 'online';
@@ -814,11 +818,11 @@
                                 cardClass = 'offline-card';
                                 if (delayMins >= 180) { cardClass += ' offline-critical'; }
                             } else if (isWarning) {
-                                statusText = 'อัปเดตปกติ • ไม่พบกลุ่มฝน';
+                                statusText = 'อัปเดตปกติ';
                                 statusStyle = 'color:#f39c12; font-weight:bold;';
                                 statusClass = 'warning';
                                 cardClass = 'warning-card';
-                                const detailMsg = st.warning_detail || 'ไม่พบกลุ่มฝนผิดปกติ • โปรดตรวจสอบ';
+                                const detailMsg = st.warning_detail || groupStats.groupWarningDetail || 'ผิดปกติ ไม่พบกลุ่มฝน • โปรดตรวจสอบ';
                                 warningBannerHtml = `<div class="warning-banner">⚠️ ${detailMsg}</div>`;
                             }
 
@@ -840,7 +844,7 @@
                                 <div>
                                     <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
                                         <div class="st-name">${st.name}</div>
-                                        <div style="text-align: right;">
+                                        <div style="text-align: right; white-space: nowrap; flex-shrink: 0;">
                                             <span class="status-dot ${statusClass}"></span>
                                             <span class="status-text" style="${statusStyle}">${statusText}</span>
                                         </div>
@@ -909,7 +913,7 @@
 
                     const popupTitle = hasError
                         ? `🔴 พบภาพค้าง (${stats.total - stats.offline}/${stats.total})`
-                        : (hasWarning ? `🟡 ไม่พบกลุ่มฝนผิดปกติ (โปรดตรวจสอบ)` : `🟢 อัปเดตปกติทุกจุด (${stats.total}/${stats.total})`);
+                        : (hasWarning ? `🟡 ผิดปกติ ไม่พบกลุ่มฝน (โปรดตรวจสอบ)` : `🟢 อัปเดตปกติทุกจุด (${stats.total}/${stats.total})`);
 
                     const popupContent = `
                         <div style="font-family: 'Segoe UI', Tahoma, sans-serif; text-align: center; min-width: 180px;">
