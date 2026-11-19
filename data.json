@@ -1,5 +1,5 @@
 {
-  "last_update": "20/11/2026 02:09:34",
+  "last_update": "20/11/2026 02:24:49",
   "archive_base_url": "https://deadline-lap-resistance-concentrations.trycloudflare.com",
   "recent_events": [
     "🟡 ชุมพร (HQ) ผิดปกติ ตรวจไม่พบกลุ่มฝน (19:24 น.)",
@@ -28,7 +28,7 @@
       "name": "สทิงพระ (HQ)",
       "status": "online",
       "url": "https://weather.tmd.go.th/stp/stp240_HQ_latest.jpg",
-      "delay_mins": 11
+      "delay_mins": 7
     },
     {
       "id": "STP_LOOP",
@@ -52,7 +52,7 @@
       "name": "นราธิวาส",
       "status": "online",
       "url": "https://weather.tmd.go.th/nrt/nrt240_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 11
     },
     {
       "id": "NRT_HQ",
@@ -60,7 +60,7 @@
       "name": "นราธิวาส (HQ)",
       "status": "online",
       "url": "https://weather.tmd.go.th/nrt/nrt240_HQ_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 11
     },
     {
       "id": "NRT_LOOP",
