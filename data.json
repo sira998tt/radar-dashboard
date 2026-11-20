@@ -1,7 +1,8 @@
 {
-  "last_update": "20/11/2026 13:13:23",
+  "last_update": "20/11/2026 13:28:08",
   "archive_base_url": "https://accessories-rfc-mark-turn.trycloudflare.com",
   "recent_events": [
+    "🟡 ชุมพร (HQ) ผิดปกติ ตรวจไม่พบกลุ่มฝน (13:27 น.)",
     "🟢 ชุมพร (HQ) พบกลุ่มฝนปกติแล้ว (12:35 น.)",
     "🟢 สทิงพระ (HQ Loop) กลับมาปกติ (12:09 น.)",
     "🟢 สทิงพระ (Loop) กลับมาปกติ (12:09 น.)",
@@ -10,8 +11,7 @@
     "🔴 สทิงพระ (HQ Loop) เริ่มค้าง (10:11 น.)",
     "🔴 สทิงพระ (HQ) เริ่มค้าง (10:11 น.)",
     "🔴 สทิงพระ (Loop) เริ่มค้าง (10:07 น.)",
-    "🔴 สทิงพระ เริ่มค้าง (10:07 น.)",
-    "🟡 ชุมพร (HQ) ผิดปกติ ตรวจไม่พบกลุ่มฝน (19:24 น.)"
+    "🔴 สทิงพระ เริ่มค้าง (10:07 น.)"
   ],
   "stations": [
     {
@@ -162,8 +162,8 @@
       "id": "CMP",
       "archive_id": "CMP",
       "name": "ชุมพร",
-      "status": "online",
-      "warning_detail": "",
+      "status": "warning",
+      "warning_detail": "ผิดปกติ ไม่พบกลุ่มฝน • พื้นที่ทับซ้อนพบฝน (สุราษฎร์ธานี (HQ)) และ สถานี AWS ในพื้นที่พบฝนตกจริง (โปรดตรวจสอบ)",
       "url": "https://weather.tmd.go.th/cmp/cmp240_latest.jpg",
       "delay_mins": 3
     },
@@ -171,8 +171,8 @@
       "id": "CMP_HQ",
       "archive_id": "CMP_HQ",
       "name": "ชุมพร (HQ)",
-      "status": "online",
-      "warning_detail": "",
+      "status": "warning",
+      "warning_detail": "ผิดปกติ ไม่พบกลุ่มฝน • พื้นที่ทับซ้อนพบฝน (สุราษฎร์ธานี (HQ)) และ สถานี AWS ในพื้นที่พบฝนตกจริง (โปรดตรวจสอบ)",
       "url": "https://weather.tmd.go.th/cmp/cmp240_HQ_latest.jpg",
       "delay_mins": 3
     },
@@ -180,8 +180,8 @@
       "id": "CMP_LOOP",
       "archive_id": "CMP",
       "name": "ชุมพร (Loop)",
-      "status": "online",
-      "warning_detail": "",
+      "status": "warning",
+      "warning_detail": "ผิดปกติ ไม่พบกลุ่มฝน • พื้นที่ทับซ้อนพบฝน (สุราษฎร์ธานี (HQ)) และ สถานี AWS ในพื้นที่พบฝนตกจริง (โปรดตรวจสอบ)",
       "url": "https://weather.tmd.go.th/cmp/cmpLoop.gif",
       "delay_mins": 3
     },
@@ -189,8 +189,8 @@
       "id": "CMP_HQ_LOOP",
       "archive_id": "CMP_HQ",
       "name": "ชุมพร (HQ Loop)",
-      "status": "online",
-      "warning_detail": "",
+      "status": "warning",
+      "warning_detail": "ผิดปกติ ไม่พบกลุ่มฝน • พื้นที่ทับซ้อนพบฝน (สุราษฎร์ธานี (HQ)) และ สถานี AWS ในพื้นที่พบฝนตกจริง (โปรดตรวจสอบ)",
       "url": "https://weather.tmd.go.th/cmp/cmpHQloop.gif",
       "delay_mins": 3
     }
