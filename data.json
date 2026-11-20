@@ -1,5 +1,5 @@
 {
-  "last_update": "20/11/2026 12:55:03",
+  "last_update": "20/11/2026 13:13:23",
   "archive_base_url": "https://accessories-rfc-mark-turn.trycloudflare.com",
   "recent_events": [
     "🟢 ชุมพร (HQ) พบกลุ่มฝนปกติแล้ว (12:35 น.)",
@@ -21,7 +21,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stp240_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 3
     },
     {
       "id": "STP_HQ",
@@ -39,7 +39,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stploop.gif",
-      "delay_mins": 0
+      "delay_mins": 3
     },
     {
       "id": "STP_HQ_LOOP",
@@ -57,7 +57,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrt240_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 3
     },
     {
       "id": "NRT_HQ",
@@ -66,7 +66,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrt240_HQ_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 3
     },
     {
       "id": "NRT_LOOP",
@@ -75,7 +75,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrtloop.gif",
-      "delay_mins": 0
+      "delay_mins": 3
     },
     {
       "id": "NRT_HQ_LOOP",
@@ -84,7 +84,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrtHQloop.gif",
-      "delay_mins": 0
+      "delay_mins": 3
     },
     {
       "id": "HYI",
@@ -93,7 +93,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyi240_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 3
     },
     {
       "id": "HYI_HQ",
@@ -102,7 +102,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyi240_HQ_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 3
     },
     {
       "id": "HYI_LOOP",
@@ -111,7 +111,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyiLoop.gif",
-      "delay_mins": 0
+      "delay_mins": 3
     },
     {
       "id": "HYI_HQ_LOOP",
@@ -120,7 +120,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyiHQloop.gif",
-      "delay_mins": 0
+      "delay_mins": 3
     },
     {
       "id": "SRT",
@@ -129,7 +129,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srt240_latest.png",
-      "delay_mins": 0
+      "delay_mins": 3
     },
     {
       "id": "SRT_HQ",
@@ -138,7 +138,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srt240_HQ_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 3
     },
     {
       "id": "SRT_LOOP",
@@ -147,7 +147,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srtloop.gif",
-      "delay_mins": 0
+      "delay_mins": 3
     },
     {
       "id": "SRT_HQ_LOOP",
@@ -156,7 +156,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srtHQloop.gif",
-      "delay_mins": 0
+      "delay_mins": 3
     },
     {
       "id": "CMP",
@@ -174,7 +174,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmp240_HQ_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 3
     },
     {
       "id": "CMP_LOOP",
