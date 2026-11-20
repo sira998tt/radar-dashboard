@@ -1,17 +1,17 @@
 {
-  "last_update": "21/11/2026 00:35:17",
+  "last_update": "21/11/2026 00:50:06",
   "archive_base_url": "https://accessories-rfc-mark-turn.trycloudflare.com",
   "recent_events": [
+    "🔴 หาดใหญ่ (HQ Loop) เริ่มค้าง (00:23 น.)",
+    "🔴 หาดใหญ่ (Loop) เริ่มค้าง (00:23 น.)",
+    "🔴 หาดใหญ่ (HQ) เริ่มค้าง (00:23 น.)",
+    "🔴 หาดใหญ่ เริ่มค้าง (00:23 น.)",
     "🟡 ชุมพร (HQ) ผิดปกติ ตรวจไม่พบกลุ่มฝน (14:26 น.)",
     "🟢 ชุมพร (HQ) พบกลุ่มฝนปกติแล้ว (13:38 น.)",
     "🟡 ชุมพร (HQ) ผิดปกติ ตรวจไม่พบกลุ่มฝน (13:27 น.)",
     "🟢 ชุมพร (HQ) พบกลุ่มฝนปกติแล้ว (12:35 น.)",
     "🟢 สทิงพระ (HQ Loop) กลับมาปกติ (12:09 น.)",
-    "🟢 สทิงพระ (Loop) กลับมาปกติ (12:09 น.)",
-    "🟢 สทิงพระ (HQ) กลับมาปกติ (12:09 น.)",
-    "🟢 สทิงพระ กลับมาปกติ (12:09 น.)",
-    "🔴 สทิงพระ (HQ Loop) เริ่มค้าง (10:11 น.)",
-    "🔴 สทิงพระ (HQ) เริ่มค้าง (10:11 น.)"
+    "🟢 สทิงพระ (Loop) กลับมาปกติ (12:09 น.)"
   ],
   "stations": [
     {
@@ -90,37 +90,37 @@
       "id": "HYI",
       "archive_id": "HYI",
       "name": "หาดใหญ่",
-      "status": "online",
+      "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyi240_latest.jpg",
-      "delay_mins": 10
+      "delay_mins": 25
     },
     {
       "id": "HYI_HQ",
       "archive_id": "HYI_HQ",
       "name": "หาดใหญ่ (HQ)",
-      "status": "online",
+      "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyi240_HQ_latest.jpg",
-      "delay_mins": 10
+      "delay_mins": 25
     },
     {
       "id": "HYI_LOOP",
       "archive_id": "HYI",
       "name": "หาดใหญ่ (Loop)",
-      "status": "online",
+      "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyiLoop.gif",
-      "delay_mins": 10
+      "delay_mins": 25
     },
     {
       "id": "HYI_HQ_LOOP",
       "archive_id": "HYI_HQ",
       "name": "หาดใหญ่ (HQ Loop)",
-      "status": "online",
+      "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyiHQloop.gif",
-      "delay_mins": 10
+      "delay_mins": 25
     },
     {
       "id": "SRT",
