@@ -1,17 +1,17 @@
 {
-  "last_update": "21/11/2026 13:53:35",
+  "last_update": "21/11/2026 14:01:25",
   "archive_base_url": "https://accessories-rfc-mark-turn.trycloudflare.com",
   "recent_events": [
+    "🔴 ชุมพร (HQ Loop) เริ่มค้าง (13:38 น.)",
+    "🔴 ชุมพร (Loop) เริ่มค้าง (13:38 น.)",
+    "🔴 ชุมพร (HQ) เริ่มค้าง (13:38 น.)",
+    "🔴 ชุมพร เริ่มค้าง (13:38 น.)",
     "🟢 สทิงพระ (HQ Loop) กลับมาปกติ (10:11 น.)",
     "🟢 สทิงพระ (HQ) กลับมาปกติ (10:11 น.)",
     "🟢 สทิงพระ (Loop) กลับมาปกติ (10:07 น.)",
     "🟢 สทิงพระ กลับมาปกติ (10:07 น.)",
     "🔴 สทิงพระ (HQ Loop) เริ่มค้าง (09:40 น.)",
-    "🔴 สทิงพระ (HQ) เริ่มค้าง (09:40 น.)",
-    "🔴 สทิงพระ (Loop) เริ่มค้าง (09:37 น.)",
-    "🔴 สทิงพระ เริ่มค้าง (09:37 น.)",
-    "🟢 นราธิวาส (HQ Loop) กลับมาปกติ (03:24 น.)",
-    "🟢 นราธิวาส (Loop) กลับมาปกติ (03:24 น.)"
+    "🔴 สทิงพระ (HQ) เริ่มค้าง (09:40 น.)"
   ],
   "stations": [
     {
@@ -21,7 +21,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stp240_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 7
     },
     {
       "id": "STP_HQ",
@@ -30,7 +30,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stp240_HQ_latest.jpg",
-      "delay_mins": 11
+      "delay_mins": 3
     },
     {
       "id": "STP_LOOP",
@@ -39,7 +39,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stploop.gif",
-      "delay_mins": 0
+      "delay_mins": 7
     },
     {
       "id": "STP_HQ_LOOP",
@@ -48,7 +48,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stpHQloop.gif",
-      "delay_mins": 11
+      "delay_mins": 3
     },
     {
       "id": "NRT",
@@ -57,7 +57,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrt240_latest.jpg",
-      "delay_mins": 14
+      "delay_mins": 3
     },
     {
       "id": "NRT_HQ",
@@ -66,7 +66,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrt240_HQ_latest.jpg",
-      "delay_mins": 14
+      "delay_mins": 3
     },
     {
       "id": "NRT_LOOP",
@@ -75,7 +75,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrtloop.gif",
-      "delay_mins": 14
+      "delay_mins": 3
     },
     {
       "id": "NRT_HQ_LOOP",
@@ -84,7 +84,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrtHQloop.gif",
-      "delay_mins": 14
+      "delay_mins": 3
     },
     {
       "id": "HYI",
@@ -93,7 +93,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyi240_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 7
     },
     {
       "id": "HYI_HQ",
@@ -102,7 +102,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyi240_HQ_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 7
     },
     {
       "id": "HYI_LOOP",
@@ -111,7 +111,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyiLoop.gif",
-      "delay_mins": 0
+      "delay_mins": 7
     },
     {
       "id": "HYI_HQ_LOOP",
@@ -120,7 +120,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyiHQloop.gif",
-      "delay_mins": 0
+      "delay_mins": 7
     },
     {
       "id": "SRT",
@@ -129,7 +129,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srt240_latest.png",
-      "delay_mins": 0
+      "delay_mins": 7
     },
     {
       "id": "SRT_HQ",
@@ -138,7 +138,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srt240_HQ_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 7
     },
     {
       "id": "SRT_LOOP",
@@ -147,7 +147,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srtloop.gif",
-      "delay_mins": 0
+      "delay_mins": 7
     },
     {
       "id": "SRT_HQ_LOOP",
@@ -156,43 +156,43 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srtHQloop.gif",
-      "delay_mins": 0
+      "delay_mins": 7
     },
     {
       "id": "CMP",
       "archive_id": "CMP",
       "name": "ชุมพร",
-      "status": "warning",
-      "warning_detail": "ผิดปกติ ไม่พบกลุ่มฝน • พื้นที่ทับซ้อนพบฝน (สุราษฎร์ธานี (HQ)) และ สถานี AWS ในพื้นที่พบฝนตกจริง (โปรดตรวจสอบ)",
+      "status": "offline",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmp240_latest.jpg",
-      "delay_mins": 14
+      "delay_mins": 22
     },
     {
       "id": "CMP_HQ",
       "archive_id": "CMP_HQ",
       "name": "ชุมพร (HQ)",
-      "status": "warning",
-      "warning_detail": "ผิดปกติ ไม่พบกลุ่มฝน • พื้นที่ทับซ้อนพบฝน (สุราษฎร์ธานี (HQ)) และ สถานี AWS ในพื้นที่พบฝนตกจริง (โปรดตรวจสอบ)",
+      "status": "offline",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmp240_HQ_latest.jpg",
-      "delay_mins": 14
+      "delay_mins": 22
     },
     {
       "id": "CMP_LOOP",
       "archive_id": "CMP",
       "name": "ชุมพร (Loop)",
-      "status": "warning",
-      "warning_detail": "ผิดปกติ ไม่พบกลุ่มฝน • พื้นที่ทับซ้อนพบฝน (สุราษฎร์ธานี (HQ)) และ สถานี AWS ในพื้นที่พบฝนตกจริง (โปรดตรวจสอบ)",
+      "status": "offline",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmpLoop.gif",
-      "delay_mins": 14
+      "delay_mins": 22
     },
     {
       "id": "CMP_HQ_LOOP",
       "archive_id": "CMP_HQ",
       "name": "ชุมพร (HQ Loop)",
-      "status": "warning",
-      "warning_detail": "ผิดปกติ ไม่พบกลุ่มฝน • พื้นที่ทับซ้อนพบฝน (สุราษฎร์ธานี (HQ)) และ สถานี AWS ในพื้นที่พบฝนตกจริง (โปรดตรวจสอบ)",
+      "status": "offline",
+      "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmpHQloop.gif",
-      "delay_mins": 14
+      "delay_mins": 22
     }
   ]
 }
