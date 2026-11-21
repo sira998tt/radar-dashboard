@@ -1,5 +1,5 @@
 {
-  "last_update": "21/11/2026 07:24:56",
+  "last_update": "21/11/2026 07:39:58",
   "archive_base_url": "https://accessories-rfc-mark-turn.trycloudflare.com",
   "recent_events": [
     "🟢 นราธิวาส (HQ Loop) กลับมาปกติ (03:24 น.)",
@@ -30,7 +30,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stp240_HQ_latest.jpg",
-      "delay_mins": 14
+      "delay_mins": 0
     },
     {
       "id": "STP_LOOP",
@@ -183,7 +183,7 @@
       "status": "warning",
       "warning_detail": "ผิดปกติ ไม่พบกลุ่มฝน • พื้นที่ทับซ้อนพบฝน (สุราษฎร์ธานี (HQ)) และ สถานี AWS ในพื้นที่พบฝนตกจริง (โปรดตรวจสอบ)",
       "url": "https://weather.tmd.go.th/cmp/cmpLoop.gif",
-      "delay_mins": 3
+      "delay_mins": 0
     },
     {
       "id": "CMP_HQ_LOOP",
