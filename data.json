@@ -1,17 +1,17 @@
 {
-  "last_update": "22/11/2026 09:23:09",
+  "last_update": "22/11/2026 09:34:36",
   "archive_base_url": "https://accessories-rfc-mark-turn.trycloudflare.com",
   "recent_events": [
+    "🔴 นราธิวาส (HQ Loop) เริ่มค้าง (09:11 น.)",
+    "🔴 นราธิวาส (Loop) เริ่มค้าง (09:11 น.)",
+    "🔴 นราธิวาส (HQ) เริ่มค้าง (09:11 น.)",
+    "🔴 นราธิวาส เริ่มค้าง (09:11 น.)",
     "🟢 สทิงพระ (HQ Loop) กลับมาปกติ (08:26 น.)",
     "🟢 สทิงพระ (HQ) กลับมาปกติ (08:26 น.)",
     "🟢 สทิงพระ (Loop) กลับมาปกติ (08:22 น.)",
     "🟢 สทิงพระ กลับมาปกติ (08:22 น.)",
     "🔴 สทิงพระ (HQ Loop) เริ่มค้าง (22:55 น.)",
-    "🔴 สทิงพระ (Loop) เริ่มค้าง (22:55 น.)",
-    "🔴 สทิงพระ (HQ) เริ่มค้าง (22:55 น.)",
-    "🔴 สทิงพระ เริ่มค้าง (22:55 น.)",
-    "🟢 สทิงพระ (HQ Loop) กลับมาปกติ (20:24 น.)",
-    "🟢 สทิงพระ (Loop) กลับมาปกติ (20:24 น.)"
+    "🔴 สทิงพระ (Loop) เริ่มค้าง (22:55 น.)"
   ],
   "stations": [
     {
@@ -21,7 +21,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stp240_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 11
     },
     {
       "id": "STP_HQ",
@@ -30,7 +30,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stp240_HQ_latest.jpg",
-      "delay_mins": 11
+      "delay_mins": 7
     },
     {
       "id": "STP_LOOP",
@@ -39,7 +39,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stploop.gif",
-      "delay_mins": 0
+      "delay_mins": 11
     },
     {
       "id": "STP_HQ_LOOP",
@@ -48,43 +48,43 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stpHQloop.gif",
-      "delay_mins": 11
+      "delay_mins": 7
     },
     {
       "id": "NRT",
       "archive_id": "NRT",
       "name": "นราธิวาส",
-      "status": "online",
+      "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrt240_latest.jpg",
-      "delay_mins": 11
+      "delay_mins": 22
     },
     {
       "id": "NRT_HQ",
       "archive_id": "NRT_HQ",
       "name": "นราธิวาส (HQ)",
-      "status": "online",
+      "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrt240_HQ_latest.jpg",
-      "delay_mins": 11
+      "delay_mins": 22
     },
     {
       "id": "NRT_LOOP",
       "archive_id": "NRT",
       "name": "นราธิวาส (Loop)",
-      "status": "online",
+      "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrtloop.gif",
-      "delay_mins": 11
+      "delay_mins": 22
     },
     {
       "id": "NRT_HQ_LOOP",
       "archive_id": "NRT_HQ",
       "name": "นราธิวาส (HQ Loop)",
-      "status": "online",
+      "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrtHQloop.gif",
-      "delay_mins": 11
+      "delay_mins": 22
     },
     {
       "id": "HYI",
@@ -93,7 +93,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyi240_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 11
     },
     {
       "id": "HYI_HQ",
@@ -102,7 +102,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyi240_HQ_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 11
     },
     {
       "id": "HYI_LOOP",
@@ -111,7 +111,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyiLoop.gif",
-      "delay_mins": 0
+      "delay_mins": 11
     },
     {
       "id": "HYI_HQ_LOOP",
@@ -120,7 +120,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/hyi/hyiHQloop.gif",
-      "delay_mins": 0
+      "delay_mins": 11
     },
     {
       "id": "SRT",
@@ -129,7 +129,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srt240_latest.png",
-      "delay_mins": 0
+      "delay_mins": 11
     },
     {
       "id": "SRT_HQ",
@@ -138,7 +138,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srt240_HQ_latest.jpg",
-      "delay_mins": 0
+      "delay_mins": 11
     },
     {
       "id": "SRT_LOOP",
@@ -147,7 +147,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srtloop.gif",
-      "delay_mins": 0
+      "delay_mins": 11
     },
     {
       "id": "SRT_HQ_LOOP",
@@ -156,7 +156,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srtHQloop.gif",
-      "delay_mins": 0
+      "delay_mins": 11
     },
     {
       "id": "CMP",
@@ -165,7 +165,7 @@
       "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmp240_latest.jpg",
-      "delay_mins": 1184
+      "delay_mins": 1195
     },
     {
       "id": "CMP_HQ",
@@ -174,7 +174,7 @@
       "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmp240_HQ_latest.jpg",
-      "delay_mins": 1184
+      "delay_mins": 1195
     },
     {
       "id": "CMP_LOOP",
@@ -183,7 +183,7 @@
       "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmpLoop.gif",
-      "delay_mins": 1184
+      "delay_mins": 1195
     },
     {
       "id": "CMP_HQ_LOOP",
@@ -192,7 +192,7 @@
       "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmpHQloop.gif",
-      "delay_mins": 1184
+      "delay_mins": 1195
     }
   ]
 }
