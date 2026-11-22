@@ -1,5 +1,5 @@
 {
-  "last_update": "23/11/2026 04:49:18",
+  "last_update": "23/11/2026 05:04:21",
   "archive_base_url": "https://accessories-rfc-mark-turn.trycloudflare.com",
   "recent_events": [
     "🔴 สทิงพระ (HQ Loop) เริ่มค้าง (20:26 น.)",
@@ -21,7 +21,7 @@
       "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stp240_latest.jpg",
-      "delay_mins": 505
+      "delay_mins": 520
     },
     {
       "id": "STP_HQ",
@@ -30,7 +30,7 @@
       "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stp240_HQ_latest.jpg",
-      "delay_mins": 502
+      "delay_mins": 517
     },
     {
       "id": "STP_LOOP",
@@ -39,7 +39,7 @@
       "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stploop.gif",
-      "delay_mins": 505
+      "delay_mins": 520
     },
     {
       "id": "STP_HQ_LOOP",
@@ -48,7 +48,7 @@
       "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stpHQloop.gif",
-      "delay_mins": 502
+      "delay_mins": 517
     },
     {
       "id": "NRT",
@@ -165,7 +165,7 @@
       "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmp240_latest.jpg",
-      "delay_mins": 2350
+      "delay_mins": 2365
     },
     {
       "id": "CMP_HQ",
@@ -174,7 +174,7 @@
       "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmp240_HQ_latest.jpg",
-      "delay_mins": 2350
+      "delay_mins": 2365
     },
     {
       "id": "CMP_LOOP",
@@ -183,7 +183,7 @@
       "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmpLoop.gif",
-      "delay_mins": 2350
+      "delay_mins": 2365
     },
     {
       "id": "CMP_HQ_LOOP",
@@ -192,7 +192,7 @@
       "status": "offline",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/cmp/cmpHQloop.gif",
-      "delay_mins": 2350
+      "delay_mins": 2365
     }
   ]
 }
