@@ -22,6 +22,7 @@
             --map-loading-bg: rgba(255, 255, 255, 0.8);
             --critical-bg: #fff0f0;
             --warning-bg: #fff8e6;
+            --maint-bg: #eef2ff;
             --event-bg: #e8f4f8;
             --modal-bg: #ffffff;
         }
@@ -39,6 +40,7 @@
             --map-loading-bg: rgba(30, 30, 30, 0.8);
             --critical-bg: #3a1515;
             --warning-bg: #33270d;
+            --maint-bg: #1c2238;
             --event-bg: #1f2933;
             --modal-bg: #1f2428;
         }
@@ -72,6 +74,7 @@
         .summary-pill:active { transform: scale(0.97); }
         .summary-pill.error { border-left-color: #e74c3c; background-color: var(--critical-bg); animation: pillPulse 2s infinite; }
         .summary-pill.warning { border-left-color: #f39c12; background-color: var(--warning-bg); animation: pillWarnPulse 2.2s infinite; }
+        .summary-pill.maintenance { border-left-color: #6366f1; background-color: var(--maint-bg); }
         @keyframes pillWarnPulse { 0%, 100% { box-shadow: 0 3px 6px var(--card-shadow); } 50% { box-shadow: 0 0 12px rgba(243, 156, 18, 0.55); } }
         @keyframes pillPulse { 0%, 100% { box-shadow: 0 3px 6px var(--card-shadow); } 50% { box-shadow: 0 0 12px rgba(231, 76, 60, 0.55); } }
         .card.scroll-highlight { outline: 3px solid #f39c12; box-shadow: 0 0 18px rgba(243, 156, 18, 0.75) !important; transition: outline 0.3s, box-shadow 0.3s; }
@@ -81,8 +84,11 @@
         .card:hover { transform: translateY(-3px); box-shadow: 0 6px 12px var(--card-shadow-hover); }
         .card.offline-card { border-top: 4px solid #e74c3c; }
         .card.warning-card { border-top: 4px solid #f39c12; background-color: var(--warning-bg); }
+        .card.maintenance-card { border-top: 4px solid #6366f1; background-color: var(--maint-bg); }
         .warning-banner { background: rgba(243, 156, 18, 0.18); border: 1px solid rgba(243, 156, 18, 0.55); color: #d68910; border-radius: 8px; padding: 6px 8px; font-size: 12px; font-weight: bold; margin: 4px 0 8px 0; text-align: left; line-height: 1.35; }
         body.dark-mode .warning-banner { color: #f8c471; background: rgba(243, 156, 18, 0.16); }
+        .maintenance-banner { background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.5); color: #4f46e5; border-radius: 8px; padding: 6px 8px; font-size: 12px; font-weight: bold; margin: 4px 0 8px 0; text-align: left; line-height: 1.35; }
+        body.dark-mode .maintenance-banner { color: #a5b4fc; background: rgba(99, 102, 241, 0.18); }
         
         .card.offline-critical { border-top: 4px solid #8b0000 !important; background-color: var(--critical-bg); animation: shake 2.5s infinite; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 2%, 6%, 10% { transform: translateX(-2px); } 4%, 8% { transform: translateX(2px); } 12% { transform: translateX(0); } }
@@ -95,6 +101,7 @@
         .online { background-color: #2ecc71; box-shadow: 0 0 10px #2ecc71; }
         .offline { background-color: #e74c3c; box-shadow: 0 0 10px #e74c3c; animation: blink 1s infinite; }
         .warning { background-color: #f39c12; box-shadow: 0 0 10px #f39c12; animation: blink 1.5s infinite; }
+        .maintenance { background-color: #6366f1; box-shadow: 0 0 10px #6366f1; }
         
         .st-name { font-size: 18px; font-weight: bold; margin: 5px 0; color: var(--text-main); text-align: left; }
         .card-actions { display: flex; gap: 8px; margin-top: 4px; }
@@ -199,7 +206,8 @@
     <div class="top-controls">
         <button class="control-btn" id="tvToggle" title="เปิดโหมดเต็มจอสำหรับทีวี">📺 โหมดทีวี</button>
         <button class="control-btn" id="viewToggle" title="สลับมุมมองแผนที่/การ์ด">🗺️ แผนที่</button>
-        <button class="control-btn" id="soundToggle" title="สลับโหมดแจ้งเตือน">🔕 ปิดเสียง</button>
+        <button class="control-btn" id="soundToggle" title="สลับโหมดแจ้งเตือน (ปิด / เฉพาะภาพค้าง / ทั้งหมด)">🔕 ปิดเสียง</button>
+        <button class="control-btn" id="quietToggle" title="โหมดเงียบช่วงกลางคืน (22:00-06:00)">🌙 เงียบกลางคืน: ปิด</button>
         <button class="control-btn icon-btn" id="themeToggle" title="สลับโหมดสว่าง/มืด">🌙</button>
     </div>
 
@@ -322,10 +330,12 @@
         });
 
         // -----------------------------------------
-        // 🔊 ระบบเสียงเตือน
+        // 🔊 ระบบเสียงเตือนแยกตามระดับความรุนแรง + โหมดเงียบกลางคืน (Quiet Hours)
         // -----------------------------------------
-        let soundMode = 0; 
+        let soundMode = parseInt(localStorage.getItem('radarSoundMode') || '0', 10);
+        let quietHoursEnabled = localStorage.getItem('radarQuietHours') === '1';
         const soundToggleBtn = document.getElementById('soundToggle');
+        const quietToggleBtn = document.getElementById('quietToggle');
         const ackBtn = document.getElementById('ackBtn');
         
         const shortSound = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
@@ -333,13 +343,40 @@
         
         const longSound = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
         longSound.volume = 1.0;
-        longSound.loop = true; 
+        longSound.loop = true;
+
+        function isWithinQuietHours() {
+            if (!quietHoursEnabled) return false;
+            const hr = new Date().getHours();
+            return (hr >= 22 || hr < 6);
+        }
+
+        function refreshSoundUI() {
+            if (soundMode === 0) {
+                soundToggleBtn.innerText = '🔕 ปิดเสียง';
+                longSound.pause(); longSound.currentTime = 0;
+            } else if (soundMode === 1) {
+                soundToggleBtn.innerText = '🔔 เตือนเฉพาะค้าง (สั้น)';
+            } else if (soundMode === 2) {
+                soundToggleBtn.innerText = '🚨 เตือนเฉพาะค้าง (ยาว)';
+            } else if (soundMode === 3) {
+                soundToggleBtn.innerText = '🚨 เตือนทั้งหมด (แดง+เหลือง)';
+            }
+            quietToggleBtn.innerText = quietHoursEnabled ? '🌙 เงียบ 22-06 น.: เปิด' : '🌙 เงียบกลางคืน: ปิด';
+            quietToggleBtn.style.opacity = quietHoursEnabled ? '1' : '0.8';
+        }
+        refreshSoundUI();
 
         soundToggleBtn.addEventListener('click', () => {
-            soundMode = (soundMode + 1) % 3; 
-            if (soundMode === 0) { soundToggleBtn.innerText = '🔕 ปิดเสียง'; longSound.pause(); longSound.currentTime = 0; } 
-            else if (soundMode === 1) { soundToggleBtn.innerText = '🔔 เตือนสั้น'; shortSound.play().catch(e=>console.log(e)); } 
-            else if (soundMode === 2) { soundToggleBtn.innerText = '🚨 เตือนยาว'; shortSound.play().catch(e=>console.log(e)); }
+            soundMode = (soundMode + 1) % 4;
+            localStorage.setItem('radarSoundMode', String(soundMode));
+            refreshSoundUI();
+            if (soundMode > 0) { shortSound.play().catch(e=>console.log(e)); }
+        });
+        quietToggleBtn.addEventListener('click', () => {
+            quietHoursEnabled = !quietHoursEnabled;
+            localStorage.setItem('radarQuietHours', quietHoursEnabled ? '1' : '0');
+            refreshSoundUI();
         });
         ackBtn.addEventListener('click', () => { longSound.pause(); longSound.currentTime = 0; ackBtn.style.display = 'none'; });
 
@@ -736,11 +773,30 @@
                     summaryContainer.innerHTML = '';
 
                     const groups = {};
-                    const currentStateString = data.stations.map(st => `${st.id}:${st.status}`).join('|');
+                    const currentMap = {};
+                    data.stations.forEach(st => {
+                        currentMap[st.id] = st.status === 'maintenance' ? 'online' : st.status;
+                    });
+                    const currentStateString = JSON.stringify(currentMap);
 
-                    if (previousStateString !== null && previousStateString !== currentStateString) {
-                        if (soundMode === 1) { shortSound.play().catch(e=>console.log(e)); } 
-                        else if (soundMode === 2) { longSound.play().catch(e=>console.log(e)); ackBtn.style.display = 'block'; }
+                    if (previousStateString !== null && previousStateString !== currentStateString && !isWithinQuietHours()) {
+                        try {
+                            const prevMap = JSON.parse(previousStateString);
+                            let hasNewOffline = false;
+                            let hasNewWarning = false;
+                            for (const [sid, stVal] of Object.entries(currentMap)) {
+                                if (prevMap[sid] !== stVal) {
+                                    if (stVal === 'offline') hasNewOffline = true;
+                                    else if (stVal === 'warning') hasNewWarning = true;
+                                }
+                            }
+                            if (hasNewOffline) {
+                                if (soundMode === 1) { shortSound.play().catch(e=>console.log(e)); }
+                                else if (soundMode === 2 || soundMode === 3) { longSound.play().catch(e=>console.log(e)); ackBtn.style.display = 'block'; }
+                            } else if (hasNewWarning && soundMode === 3) {
+                                shortSound.play().catch(e=>console.log(e));
+                            }
+                        } catch (_) {}
                     }
                     previousStateString = currentStateString;
 
@@ -752,11 +808,14 @@
                                 total: 0,
                                 offline: 0,
                                 warning: 0,
+                                maintenance: 0,
                                 maxDelay: 0,
                                 originalIndex: groupOrderCounter++,
                                 offlineDetails: [],
                                 warningDetails: [],
+                                maintenanceDetails: [],
                                 groupWarningDetail: '',
+                                groupMaintDetail: '',
                                 stations: []
                             };
                         }
@@ -765,7 +824,17 @@
 
                         const isOffline = st.status === 'offline';
                         const isWarning = st.status === 'warning';
-                        if (isOffline) {
+                        const isMaint = st.status === 'maintenance';
+                        if (isMaint) {
+                            groups[baseName].maintenance += 1;
+                            const mDetail = st.warning_detail || 'กำลังซ่อมบำรุง • พักแจ้งเตือนชั่วคราว';
+                            if (!groups[baseName].groupMaintDetail || st.warning_detail) {
+                                groups[baseName].groupMaintDetail = mDetail;
+                            }
+                            if (groups[baseName].maintenanceDetails.length === 0) {
+                                groups[baseName].maintenanceDetails.push(`🔧 ${baseName} <br><small style="color:#6366f1;">${mDetail}</small>`);
+                            }
+                        } else if (isOffline) {
                             groups[baseName].offline += 1;
                             const delayMins = st.delay_mins || 0;
                             if (delayMins > groups[baseName].maxDelay) {
@@ -788,10 +857,10 @@
                     const sortedGroupEntries = Object.entries(groups).sort((a, b) => {
                         const statsA = a[1];
                         const statsB = b[1];
-                        const prioA = statsA.offline > 0 ? 2 : (statsA.warning > 0 ? 1 : 0);
-                        const prioB = statsB.offline > 0 ? 2 : (statsB.warning > 0 ? 1 : 0);
+                        const prioA = statsA.offline > 0 ? 3 : (statsA.warning > 0 ? 2 : (statsA.maintenance > 0 ? 1 : 0));
+                        const prioB = statsB.offline > 0 ? 3 : (statsB.warning > 0 ? 2 : (statsB.maintenance > 0 ? 1 : 0));
                         if (prioA !== prioB) return prioB - prioA;
-                        if (prioA === 2 && prioB === 2) {
+                        if (prioA === 3 && prioB === 3) {
                             if (statsB.offline !== statsA.offline) return statsB.offline - statsA.offline;
                             if (statsB.maxDelay !== statsA.maxDelay) return statsB.maxDelay - statsA.maxDelay;
                         }
@@ -801,22 +870,33 @@
                     // วาดการ์ดตามลำดับกลุ่มที่จัดเรียงแล้ว (ยกแถว 4 ใบ)
                     sortedGroupEntries.forEach(([baseName, groupStats]) => {
                         groupStats.stations.forEach((st, idx) => {
-                            const isOffline = st.status === 'offline';
-                            const isWarning = !isOffline && (st.status === 'warning' || groupStats.warning > 0);
+                            const isMaint = st.status === 'maintenance' || groupStats.maintenance > 0;
+                            const isOffline = !isMaint && st.status === 'offline';
+                            const isWarning = !isMaint && !isOffline && (st.status === 'warning' || groupStats.warning > 0);
                             let statusText = 'อัปเดตปกติ';
                             let statusStyle = '';
                             let statusClass = 'online';
                             let cardClass = '';
                             let warningBannerHtml = '';
 
-                            if (isOffline) {
+                            if (isMaint) {
+                                statusText = 'กำลังซ่อมบำรุง';
+                                statusStyle = 'color:#818cf8; font-weight:bold;';
+                                statusClass = 'maintenance';
+                                cardClass = 'maintenance-card';
+                                const mDetailMsg = st.warning_detail || groupStats.groupMaintDetail || 'กำลังซ่อมบำรุง • พักแจ้งเตือนชั่วคราว';
+                                warningBannerHtml = `<div class="maintenance-banner">🔧 ${mDetailMsg}</div>`;
+                            } else if (isOffline) {
                                 const delayMins = st.delay_mins || 0;
                                 const timeStr = formatDelayTime(delayMins);
-                                statusText = `ภาพค้างมาแล้ว ${timeStr}`;
+                                statusText = st.warning_detail ? 'ต้นทางขัดข้อง' : `ภาพค้างมาแล้ว ${timeStr}`;
                                 statusStyle = 'color:#e74c3c; font-weight:bold;';
                                 statusClass = 'offline';
                                 cardClass = 'offline-card';
                                 if (delayMins >= 180) { cardClass += ' offline-critical'; }
+                                if (st.warning_detail) {
+                                    warningBannerHtml = `<div class="warning-banner" style="border-color:rgba(231,76,60,0.6); color:#e74c3c; background:rgba(231,76,60,0.12);">🌐 ${st.warning_detail}</div>`;
+                                }
                             } else if (isWarning) {
                                 statusText = 'อัปเดตปกติ';
                                 statusStyle = 'color:#f39c12; font-weight:bold;';
@@ -863,11 +943,14 @@
                     // 📌 แนวทางที่ 3: ปุ่มสรุปสถานะด้านบน (เรียงสถานีที่ค้างไว้ซ้ายสุด และคลิกเพื่อเลื่อนหน้าจอไปหาแถวสถานีนั้นได้ทันที)
                     sortedGroupEntries.forEach(([name, stats]) => {
                         const pill = document.createElement('div');
-                        const hasError = stats.offline > 0;
-                        const hasWarning = stats.warning > 0;
-                        pill.className = `summary-pill ${hasError ? 'error' : (hasWarning ? 'warning' : '')}`;
+                        const hasMaint = stats.maintenance > 0;
+                        const hasError = !hasMaint && stats.offline > 0;
+                        const hasWarning = !hasMaint && stats.warning > 0;
+                        pill.className = `summary-pill ${hasMaint ? 'maintenance' : (hasError ? 'error' : (hasWarning ? 'warning' : ''))}`;
                         pill.title = `คลิกเพื่อเลื่อนไปยังแถวเรดาร์${name}`;
-                        if (hasError) {
+                        if (hasMaint) {
+                            pill.innerHTML = `🔧 ${name} (ซ่อมบำรุง)`;
+                        } else if (hasError) {
                             pill.innerHTML = `🔴 ${name} (${stats.total - stats.offline}/${stats.total})`;
                         } else if (hasWarning) {
                             pill.innerHTML = `🟡 ${name} (โปรดตรวจสอบ)`;
@@ -899,21 +982,26 @@
 
             for (const [name, stats] of Object.entries(groups)) {
                 if (stationCoords[name]) {
-                    const hasError = stats.offline > 0;
-                    const hasWarning = stats.warning > 0;
-                    const color = hasError ? '#e74c3c' : (hasWarning ? '#f39c12' : '#2ecc71');
+                    const hasMaint = stats.maintenance > 0;
+                    const hasError = !hasMaint && stats.offline > 0;
+                    const hasWarning = !hasMaint && stats.warning > 0;
+                    const color = hasMaint ? '#6366f1' : (hasError ? '#e74c3c' : (hasWarning ? '#f39c12' : '#2ecc71'));
                     
                     let detailsHtml = "";
-                    const combinedDetails = [...(stats.offlineDetails || []), ...(stats.warningDetails || [])];
+                    const combinedDetails = hasMaint
+                        ? [...(stats.maintenanceDetails || [])]
+                        : [...(stats.offlineDetails || []), ...(stats.warningDetails || [])];
                     if (combinedDetails.length > 0) {
                         detailsHtml = `<div style="margin-top:10px; text-align:left; border-top: 1px solid #eee; padding-top: 8px;">`;
                         detailsHtml += combinedDetails.join('<br><br>');
                         detailsHtml += `</div>`;
                     }
 
-                    const popupTitle = hasError
-                        ? `🔴 พบภาพค้าง (${stats.total - stats.offline}/${stats.total})`
-                        : (hasWarning ? `🟡 ผิดปกติ ไม่พบกลุ่มฝน (โปรดตรวจสอบ)` : `🟢 อัปเดตปกติทุกจุด (${stats.total}/${stats.total})`);
+                    const popupTitle = hasMaint
+                        ? `🔧 กำลังซ่อมบำรุง (พักแจ้งเตือน)`
+                        : (hasError
+                            ? `🔴 พบภาพค้าง (${stats.total - stats.offline}/${stats.total})`
+                            : (hasWarning ? `🟡 ผิดปกติ ไม่พบกลุ่มฝน (โปรดตรวจสอบ)` : `🟢 อัปเดตปกติทุกจุด (${stats.total}/${stats.total})`));
 
                     const popupContent = `
                         <div style="font-family: 'Segoe UI', Tahoma, sans-serif; text-align: center; min-width: 180px;">
