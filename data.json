@@ -1,7 +1,8 @@
 {
-  "last_update": "23/11/2026 10:34:40",
+  "last_update": "23/11/2026 10:52:43",
   "archive_base_url": "https://refurbished-kennedy-hanging-somewhat.trycloudflare.com",
   "recent_events": [
+    "🔧 ชุมพร เข้าโหมดซ่อมบำรุง (720 ชม.)",
     "🟢 สทิงพระ (HQ Loop) กลับมาปกติ (07:25 น.)",
     "🟢 สทิงพระ (Loop) กลับมาปกติ (07:25 น.)",
     "🟢 สทิงพระ (HQ) กลับมาปกติ (07:25 น.)",
@@ -10,8 +11,7 @@
     "🔴 สทิงพระ (HQ) เริ่มค้าง (20:26 น.)",
     "🔴 สทิงพระ (Loop) เริ่มค้าง (20:22 น.)",
     "🔴 สทิงพระ เริ่มค้าง (20:22 น.)",
-    "🟢 สทิงพระ (HQ Loop) กลับมาปกติ (15:39 น.)",
-    "🟢 สทิงพระ (Loop) กลับมาปกติ (15:39 น.)"
+    "🟢 สทิงพระ (HQ Loop) กลับมาปกติ (15:39 น.)"
   ],
   "stations": [
     {
@@ -21,7 +21,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stp240_latest.jpg",
-      "delay_mins": 11
+      "delay_mins": 0
     },
     {
       "id": "STP_HQ",
@@ -30,7 +30,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stp240_HQ_latest.jpg",
-      "delay_mins": 7
+      "delay_mins": 11
     },
     {
       "id": "STP_LOOP",
@@ -39,7 +39,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stploop.gif",
-      "delay_mins": 11
+      "delay_mins": 0
     },
     {
       "id": "STP_HQ_LOOP",
@@ -162,37 +162,37 @@
       "id": "CMP",
       "archive_id": "CMP",
       "name": "ชุมพร",
-      "status": "offline",
-      "warning_detail": "",
+      "status": "maintenance",
+      "warning_detail": "กำลังซ่อมบำรุง • พักแจ้งเตือนถึง 23/12 10:52 น. (ยกเลิกอัตโนมัติเมื่อภาพปกติ)",
       "url": "https://weather.tmd.go.th/cmp/cmp240_latest.jpg",
-      "delay_mins": 2695
+      "delay_mins": 2710
     },
     {
       "id": "CMP_HQ",
       "archive_id": "CMP_HQ",
       "name": "ชุมพร (HQ)",
-      "status": "offline",
-      "warning_detail": "",
+      "status": "maintenance",
+      "warning_detail": "กำลังซ่อมบำรุง • พักแจ้งเตือนถึง 23/12 10:52 น. (ยกเลิกอัตโนมัติเมื่อภาพปกติ)",
       "url": "https://weather.tmd.go.th/cmp/cmp240_HQ_latest.jpg",
-      "delay_mins": 2695
+      "delay_mins": 2710
     },
     {
       "id": "CMP_LOOP",
       "archive_id": "CMP",
       "name": "ชุมพร (Loop)",
-      "status": "offline",
-      "warning_detail": "",
+      "status": "maintenance",
+      "warning_detail": "กำลังซ่อมบำรุง • พักแจ้งเตือนถึง 23/12 10:52 น. (ยกเลิกอัตโนมัติเมื่อภาพปกติ)",
       "url": "https://weather.tmd.go.th/cmp/cmpLoop.gif",
-      "delay_mins": 2695
+      "delay_mins": 2710
     },
     {
       "id": "CMP_HQ_LOOP",
       "archive_id": "CMP_HQ",
       "name": "ชุมพร (HQ Loop)",
-      "status": "offline",
-      "warning_detail": "",
+      "status": "maintenance",
+      "warning_detail": "กำลังซ่อมบำรุง • พักแจ้งเตือนถึง 23/12 10:52 น. (ยกเลิกอัตโนมัติเมื่อภาพปกติ)",
       "url": "https://weather.tmd.go.th/cmp/cmpHQloop.gif",
-      "delay_mins": 2695
+      "delay_mins": 2710
     }
   ]
 }
