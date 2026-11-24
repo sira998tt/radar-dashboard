@@ -1,5 +1,5 @@
 {
-  "last_update": "24/11/2026 23:29:30",
+  "last_update": "24/11/2026 23:46:22",
   "archive_base_url": "https://strengths-warcraft-dallas-foto.trycloudflare.com",
   "recent_events": [
     "🟢 สทิงพระ (HQ) กลับมาปกติ (19:27 น.)",
@@ -30,7 +30,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stp240_HQ_latest.jpg",
-      "delay_mins": 3
+      "delay_mins": 6
     },
     {
       "id": "STP_LOOP",
@@ -48,7 +48,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/stp/stpHQloop.gif",
-      "delay_mins": 3
+      "delay_mins": 6
     },
     {
       "id": "NRT",
@@ -57,7 +57,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrt240_latest.jpg",
-      "delay_mins": 3
+      "delay_mins": 6
     },
     {
       "id": "NRT_HQ",
@@ -66,7 +66,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrt240_HQ_latest.jpg",
-      "delay_mins": 3
+      "delay_mins": 6
     },
     {
       "id": "NRT_LOOP",
@@ -75,7 +75,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrtloop.gif",
-      "delay_mins": 3
+      "delay_mins": 6
     },
     {
       "id": "NRT_HQ_LOOP",
@@ -84,7 +84,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/nrt/nrtHQloop.gif",
-      "delay_mins": 3
+      "delay_mins": 6
     },
     {
       "id": "HYI",
@@ -129,7 +129,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srt240_latest.png",
-      "delay_mins": 6
+      "delay_mins": 10
     },
     {
       "id": "SRT_HQ",
@@ -147,7 +147,7 @@
       "status": "online",
       "warning_detail": "",
       "url": "https://weather.tmd.go.th/srt/srtloop.gif",
-      "delay_mins": 6
+      "delay_mins": 10
     },
     {
       "id": "SRT_HQ_LOOP",
@@ -165,7 +165,7 @@
       "status": "maintenance",
       "warning_detail": "กำลังซ่อมบำรุง • พักแจ้งเตือนถึง 23/12 10:52 น. (ยกเลิกอัตโนมัติเมื่อภาพปกติ)",
       "url": "https://weather.tmd.go.th/cmp/cmp240_latest.jpg",
-      "delay_mins": 4911
+      "delay_mins": 4927
     },
     {
       "id": "CMP_HQ",
@@ -174,7 +174,7 @@
       "status": "maintenance",
       "warning_detail": "กำลังซ่อมบำรุง • พักแจ้งเตือนถึง 23/12 10:52 น. (ยกเลิกอัตโนมัติเมื่อภาพปกติ)",
       "url": "https://weather.tmd.go.th/cmp/cmp240_HQ_latest.jpg",
-      "delay_mins": 4911
+      "delay_mins": 4927
     },
     {
       "id": "CMP_LOOP",
@@ -183,7 +183,7 @@
       "status": "maintenance",
       "warning_detail": "กำลังซ่อมบำรุง • พักแจ้งเตือนถึง 23/12 10:52 น. (ยกเลิกอัตโนมัติเมื่อภาพปกติ)",
       "url": "https://weather.tmd.go.th/cmp/cmpLoop.gif",
-      "delay_mins": 4911
+      "delay_mins": 4927
     },
     {
       "id": "CMP_HQ_LOOP",
@@ -192,7 +192,7 @@
       "status": "maintenance",
       "warning_detail": "กำลังซ่อมบำรุง • พักแจ้งเตือนถึง 23/12 10:52 น. (ยกเลิกอัตโนมัติเมื่อภาพปกติ)",
       "url": "https://weather.tmd.go.th/cmp/cmpHQloop.gif",
-      "delay_mins": 4911
+      "delay_mins": 4927
     }
   ]
 }
