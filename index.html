@@ -442,6 +442,8 @@
         let archiveFrames = [];
         let currentFrameIdx = 0;
         let playTimer = null;
+        let isPlayingArchive = false;
+        let preloadAbortToken = 0;
         let playbackSpeeds = [500, 250, 120];
         let speedLabels = ["1x", "2x", "4x"];
         let speedIdx = 0;
@@ -541,11 +543,13 @@
 
         function closePlaybackModal() {
             stopPlayArchive();
+            preloadAbortToken++;
             document.getElementById('playbackModal').classList.remove('active');
         }
 
         async function onArchiveStationChange(retried = false) {
             stopPlayArchive();
+            preloadAbortToken++;
             let baseUrl = getEffectiveArchiveBaseUrl();
             const stn = document.getElementById('archiveStationSelect').value;
             const dateSel = document.getElementById('archiveDateSelect');
@@ -599,6 +603,7 @@
 
         async function loadArchiveFramesForDate() {
             stopPlayArchive();
+            preloadAbortToken++;
             const baseUrl = getEffectiveArchiveBaseUrl();
             const stn = document.getElementById('archiveStationSelect').value;
             const dateStr = document.getElementById('archiveDateSelect').value;
@@ -618,9 +623,23 @@
                 slider.value = currentFrameIdx;
                 document.getElementById('frameCountInfo').innerText = `มีภาพทั้งหมด ${archiveFrames.length} เฟรม`;
                 renderCurrentArchiveFrame();
+                preloadArchiveFrames();
             } catch (e) {
                 document.getElementById('frameCountInfo').innerText = "โหลดเฟรมภาพไม่สำเร็จ";
             }
+        }
+
+        function preloadArchiveFrames() {
+            const token = ++preloadAbortToken;
+            let idx = 0;
+            const concurrency = 4; // โหลดพร้อมกันทีละ 4 เฟรมเข้าแคชเบราว์เซอร์
+            function loadNext() {
+                if (token !== preloadAbortToken || idx >= archiveFrames.length) return;
+                const img = new Image();
+                img.onload = img.onerror = loadNext;
+                img.src = archiveFrames[idx++].fullUrl;
+            }
+            for (let i = 0; i < concurrency; i++) loadNext();
         }
 
         function renderCurrentArchiveFrame(customEmptyMsg) {
@@ -655,23 +674,50 @@
             renderCurrentArchiveFrame();
         }
 
+        function scheduleNextArchiveFrame() {
+            if (!isPlayingArchive || archiveFrames.length <= 1) return;
+            const imgEl = document.getElementById('archivePlayerImg');
+            const delay = playbackSpeeds[speedIdx];
+
+            const advance = () => {
+                if (!isPlayingArchive) return;
+                playTimer = setTimeout(() => {
+                    if (!isPlayingArchive) return;
+                    currentFrameIdx = (currentFrameIdx + 1) % archiveFrames.length;
+                    renderCurrentArchiveFrame();
+                    scheduleNextArchiveFrame();
+                }, delay);
+            };
+
+            if (imgEl.complete && imgEl.naturalWidth > 0) {
+                advance();
+            } else {
+                imgEl.onload = () => { imgEl.onload = null; advance(); };
+                imgEl.onerror = () => { imgEl.onerror = null; advance(); };
+            }
+        }
+
         function togglePlayArchive() {
-            if (playTimer) {
+            if (isPlayingArchive) {
                 stopPlayArchive();
             } else {
                 if (archiveFrames.length <= 1) return;
+                isPlayingArchive = true;
                 document.getElementById('playPauseBtn').innerText = "⏸ หยุด (Pause)";
-                playTimer = setInterval(() => {
-                    currentFrameIdx = (currentFrameIdx + 1) % archiveFrames.length;
-                    renderCurrentArchiveFrame();
-                }, playbackSpeeds[speedIdx]);
+                scheduleNextArchiveFrame();
             }
         }
 
         function stopPlayArchive() {
+            isPlayingArchive = false;
             if (playTimer) {
-                clearInterval(playTimer);
+                clearTimeout(playTimer);
                 playTimer = null;
+            }
+            const imgEl = document.getElementById('archivePlayerImg');
+            if (imgEl) {
+                imgEl.onload = null;
+                imgEl.onerror = null;
             }
             document.getElementById('playPauseBtn').innerText = "▶️ เล่น (Play)";
         }
@@ -679,7 +725,7 @@
         function cyclePlaybackSpeed() {
             speedIdx = (speedIdx + 1) % playbackSpeeds.length;
             document.getElementById('speedBtn').innerText = `⚡ ความเร็ว: ${speedLabels[speedIdx]}`;
-            if (playTimer) {
+            if (isPlayingArchive) {
                 stopPlayArchive();
                 togglePlayArchive();
             }
@@ -853,7 +899,6 @@
                     });
 
                     // 📌 แนวทางที่ 1: จัดเรียงกลุ่มสถานี (ยกแถว 4 ใบ) ดันสถานีที่มีภาพค้างขึ้นบนสุด
-                    // หากค้างหลายสถานี ให้เรียงตามจำนวนการ์ดที่ค้างและเวลาที่ค้างนานที่สุดก่อน ส่วนสถานีปกติเรียงตามลำดับเดิม
                     const sortedGroupEntries = Object.entries(groups).sort((a, b) => {
                         const statsA = a[1];
                         const statsB = b[1];
@@ -940,7 +985,7 @@
                         });
                     });
 
-                    // 📌 แนวทางที่ 3: ปุ่มสรุปสถานะด้านบน (เรียงสถานีที่ค้างไว้ซ้ายสุด และคลิกเพื่อเลื่อนหน้าจอไปหาแถวสถานีนั้นได้ทันที)
+                    // 📌 แนวทางที่ 3: ปุ่มสรุปสถานะด้านบน
                     sortedGroupEntries.forEach(([name, stats]) => {
                         const pill = document.createElement('div');
                         const hasMaint = stats.maintenance > 0;
